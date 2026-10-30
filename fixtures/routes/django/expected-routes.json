@@ -1,0 +1,11 @@
+{
+  "adapter": "python",
+  "start": "http://127.0.0.1:8000",
+  "routes": {
+    "/": "orders/views.py",
+    "/orders": "orders/views.py",
+    "/orders/:pk": "orders/views.py",
+    "/legacy": "orders/views.py",
+    "/accounts/profile": "accounts/views.py"
+  }
+}

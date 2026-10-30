@@ -1,0 +1,15 @@
+{
+  "adapter": "python",
+  "start": "http://127.0.0.1:5000",
+  "routes": {
+    "/": "app.py",
+    "/about": "app.py",
+    "/admin": "app.py",
+    "/dashboard": "app.py",
+    "/login": "app.py",
+    "/logout": "app.py",
+    "/orders/:order_id": "app.py",
+    "/reports": "app.py",
+    "/settings/profile": "settings_pages.py"
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "runs": [
+    {
+      "name": "Smoke (top menu pages) + regression, logged in",
+      "args": [
+        "--types",
+        "smoke,regression",
+        "--login",
+        "credentials"
+      ],
+      "env": {
+        "QAGENT_USERNAME": "demo@example.com",
+        "QAGENT_PASSWORD": "demo"
+      },
+      "expect": {
+        "Smoke": {
+          "site:/": "passed",
+          "login:/login": "passed",
+          "/dashboard": "passed",
+          "/about": "passed",
+          "/legacy": "passed"
+        },
+        "Full regression": {
+          "/": "passed",
+          "/about": "passed",
+          "/admin": "skipped",
+          "/broken": "failed",
+          "/dashboard": "passed",
+          "/invoice": "unverified",
+          "/legacy": "passed",
+          "/logout": "skipped",
+          "/products/:id": "passed"
+        }
+      }
+    },
+    {
+      "name": "Regression with login skipped",
+      "args": [
+        "--types",
+        "regression",
+        "--login",
+        "skip"
+      ],
+      "env": {},
+      "expect": {
+        "Full regression": {
+          "/": "unverified",
+          "/about": "passed",
+          "/admin": "unverified",
+          "/broken": "unverified",
+          "/dashboard": "unverified",
+          "/invoice": "unverified",
+          "/legacy": "unverified",
+          "/logout": "skipped",
+          "/products/:id": "unverified"
+        }
+      }
+    },
+    {
+      "name": "Smoke gate: login fails, regression is skipped",
+      "args": [
+        "--types",
+        "smoke,regression",
+        "--login",
+        "credentials"
+      ],
+      "env": {
+        "QAGENT_USERNAME": "demo@example.com",
+        "QAGENT_PASSWORD": "wrong"
+      },
+      "expect": {
+        "Smoke": {
+          "site:/": "passed",
+          "login:/login": "failed"
+        },
+        "Full regression": "skipped"
+      }
+    },
+    {
+      "name": "Security scan: real findings only",
+      "args": [
+        "--types",
+        "security",
+        "--login",
+        "credentials"
+      ],
+      "env": {
+        "QAGENT_USERNAME": "demo@example.com",
+        "QAGENT_PASSWORD": "demo"
+      },
+      "expect": {
+        "Security scan": {
+          "_partial": true,
+          "check:Secrets in code": "passed",
+          "check:Security headers": "passed",
+          "check:Cookies": "passed",
+          "check:HTTPS / TLS": "passed",
+          "check:Tokens in browser storage": "passed",
+          "check:Exposed files and URLs": "passed",
+          "check:Logged-out access": "failed",
+          "check:Role checks (IDOR)": "unverified",
+          "check:Open redirect": "passed",
+          "check:Reflected XSS": "passed",
+          "check:SQL injection signals": "passed"
+        }
+      }
+    }
+  ]
+}

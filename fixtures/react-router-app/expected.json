@@ -1,0 +1,185 @@
+{
+  "runs": [
+    {
+      "name": "Smoke + regression, logged in",
+      "args": [
+        "--types",
+        "smoke,regression",
+        "--login",
+        "credentials"
+      ],
+      "env": {
+        "QAGENT_USERNAME": "demo",
+        "QAGENT_PASSWORD": "demo"
+      },
+      "expect": {
+        "Smoke": {
+          "site:/": "passed",
+          "login:/login": "passed",
+          "/dashboard": "passed",
+          "/orders": "passed"
+        },
+        "Full regression": {
+          "/": "passed",
+          "/admin": "skipped",
+          "/audit": "passed",
+          "/crash": "failed",
+          "/customer": "unverified",
+          "/dashboard": "passed",
+          "/hang": "failed",
+          "/logout": "skipped",
+          "/orders": "passed",
+          "tab:/orders > Open": "passed",
+          "tab:/orders > Closed": "passed",
+          "/orders/:orderId": "passed",
+          "/reports": "failed",
+          "/search": "passed",
+          "/settings/profile": "passed",
+          "/stuck": "failed",
+          "/wide": "passed",
+          "/links": "passed",
+          "/slow": "passed",
+          "/colors": "passed",
+          "/sec": "passed",
+          "/guestbook": "passed"
+        }
+      }
+    },
+    {
+      "name": "Regression by crawling",
+      "args": [
+        "--types",
+        "regression",
+        "--login",
+        "credentials",
+        "--crawl"
+      ],
+      "env": {
+        "QAGENT_USERNAME": "demo",
+        "QAGENT_PASSWORD": "demo"
+      },
+      "expect": {
+        "Full regression": {
+          "/dashboard": "passed",
+          "/orders": "passed",
+          "tab:/orders > Open": "passed",
+          "tab:/orders > Closed": "passed",
+          "/search": "passed",
+          "/settings/profile": "passed"
+        }
+      }
+    },
+    {
+      "name": "Accessibility, performance, links, responsive",
+      "args": [
+        "--types",
+        "a11y,perf,links,responsive",
+        "--login",
+        "credentials"
+      ],
+      "env": {
+        "QAGENT_USERNAME": "demo",
+        "QAGENT_PASSWORD": "demo"
+      },
+      "expect": {
+        "Accessibility": {
+          "_partial": true,
+          "/settings/profile": "failed",
+          "/dashboard": "passed",
+          "/wide": "passed"
+        },
+        "Performance": {
+          "_partial": true,
+          "/slow": "failed",
+          "/dashboard": "passed",
+          "/orders": "passed"
+        },
+        "Broken links": {
+          "_partial": true,
+          "/links": "failed",
+          "/dashboard": "passed",
+          "/wide": "passed"
+        },
+        "Responsive": {
+          "_partial": true,
+          "/wide": "failed",
+          "/dashboard": "passed",
+          "/links": "passed"
+        }
+      }
+    },
+    {
+      "name": "Visual change: first run saves baselines",
+      "args": [
+        "--types",
+        "visual",
+        "--login",
+        "credentials"
+      ],
+      "env": {
+        "QAGENT_USERNAME": "demo",
+        "QAGENT_PASSWORD": "demo"
+      },
+      "clean": [
+        ".qagent/baselines"
+      ],
+      "expect": {
+        "Visual change": {
+          "_partial": true,
+          "/dashboard": "passed",
+          "/orders": "passed",
+          "/wide": "passed"
+        }
+      }
+    },
+    {
+      "name": "Visual change: unchanged pages pass",
+      "args": [
+        "--types",
+        "visual",
+        "--login",
+        "credentials"
+      ],
+      "env": {
+        "QAGENT_USERNAME": "demo",
+        "QAGENT_PASSWORD": "demo"
+      },
+      "expect": {
+        "Visual change": {
+          "_partial": true,
+          "/dashboard": "passed",
+          "/orders": "passed",
+          "/wide": "passed"
+        }
+      }
+    },
+    {
+      "name": "Critical flows and CRUD",
+      "args": [
+        "--types",
+        "flows,crud",
+        "--confirm-crud",
+        "YES",
+        "--login",
+        "credentials"
+      ],
+      "env": {
+        "QAGENT_USERNAME": "demo",
+        "QAGENT_PASSWORD": "demo"
+      },
+      "expect": {
+        "Critical flows": {
+          "flow:Open closed orders": "passed",
+          "flow:Search orders": "passed",
+          "flow:Report shows totals": "failed"
+        },
+        "CRUD": {
+          "crud:Colours > create": "passed",
+          "crud:Colours > read": "passed",
+          "crud:Colours > update": "passed",
+          "crud:Colours > delete": "passed"
+        }
+      }
+    }
+  ]
+}

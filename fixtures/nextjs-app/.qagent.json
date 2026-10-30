@@ -1,0 +1,10 @@
+{
+  "framework": "nextjs",
+  "local": { "start": "npm run dev", "url": "http://localhost:5180" },
+  "login": { "path": "/login", "loggedInPath": "/dashboard" },
+  "lists": { "smoke": [] },
+  "pages": {
+    "/products/:id": { "params": { "id": "productId" } }
+  },
+  "readiness": { "readyTimeoutMs": 20000 }
+}

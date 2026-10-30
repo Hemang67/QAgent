@@ -1,0 +1,123 @@
+{
+  "framework": "react-router",
+  "local": {
+    "start": "npm run dev",
+    "url": "http://localhost:5179"
+  },
+  "login": {
+    "path": "/login",
+    "loggedInPath": "/dashboard"
+  },
+  "lists": {
+    "smoke": [
+      "/dashboard",
+      "/orders"
+    ],
+    "criticalFlows": [
+      {
+        "name": "Open closed orders",
+        "steps": [
+          {
+            "goto": "/dashboard"
+          },
+          {
+            "click": "role=link[name=\"Orders\"]"
+          },
+          {
+            "click": "role=tab[name=\"Closed\"]"
+          },
+          {
+            "expectText": "Globex"
+          }
+        ]
+      },
+      {
+        "name": "Search orders",
+        "steps": [
+          {
+            "goto": "/search"
+          },
+          {
+            "expectText": "Acme"
+          }
+        ]
+      },
+      {
+        "name": "Report shows totals",
+        "steps": [
+          {
+            "goto": "/dashboard"
+          },
+          {
+            "click": "role=link[name=\"Search\"]"
+          },
+          {
+            "expectText": "Grand total"
+          }
+        ]
+      }
+    ],
+    "crud": [
+      {
+        "name": "Colours",
+        "route": "/colors",
+        "create": [
+          {
+            "click": "role=button[name=\"Add colour\"]"
+          },
+          {
+            "fill": "input[name=\"colorName\"]",
+            "value": "{{name}}"
+          },
+          {
+            "click": "role=button[name=\"Save\"]"
+          }
+        ],
+        "edit": [
+          {
+            "click": "role=button[name=\"Edit {{name}}\"]"
+          },
+          {
+            "fill": "input[name=\"colorName\"]",
+            "value": "{{newName}}"
+          },
+          {
+            "click": "role=button[name=\"Save\"]"
+          }
+        ],
+        "delete": [
+          {
+            "click": "role=button[name=\"Delete {{newName}}\"]"
+          }
+        ]
+      }
+    ]
+  },
+  "pages": {
+    "/orders/:orderId": {
+      "params": {
+        "orderId": "orderId"
+      }
+    }
+  },
+  "blockedEndpoints": [
+    "/api/email/send"
+  ],
+  "readOnlyAllow": [
+    "POST /api/search"
+  ],
+  "readiness": {
+    "readyTimeoutMs": 8000
+  },
+  "budgets": {
+    "readyWarnMs": 2000,
+    "readyFailMs": 3000,
+    "apiWarnMs": 2000,
+    "lcpWarnMs": 4000
+  },
+  "environments": {
+    "test": {
+      "url": "http://localhost:5179"
+    }
+  }
+}

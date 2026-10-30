@@ -1,0 +1,11 @@
+{
+  "adapter": "vue",
+  "routes": {
+    "/": "pages/index.vue",
+    "/about": "pages/about.vue",
+    "/users": "pages/users/index.vue",
+    "/users/:id": "pages/users/[id].vue",
+    "/blog/:slug?": "pages/blog/[[slug]].vue",
+    "/pricing": "pages/(marketing)/pricing.vue"
+  }
+}

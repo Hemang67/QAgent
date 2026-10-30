@@ -1,0 +1,139 @@
+{
+  "name": "qagent",
+  "productName": "QAgent",
+  "description": "Desktop app that tests any web app: finds the pages, opens each in a real browser, and records health, speed, accessibility and security problems in an Excel workbook.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Techovarya",
+    "email": "62746132+Hemang67@users.noreply.github.com",
+    "url": "https://github.com/Hemang67/QAgent"
+  },
+  "license": "MIT",
+  "private": true,
+  "homepage": "https://github.com/Hemang67/QAgent",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Hemang67/QAgent.git"
+  },
+  "main": "dist/main.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build": "node scripts/build.mjs",
+    "start": "electron .",
+    "dist": "npm run build && electron-builder --publish never",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "node scripts/build.mjs --no-ui && node scripts/e2e-fixtures.mjs && node scripts/recorder-check.mjs && node scripts/security-check.mjs",
+    "test:app": "npm run build && node scripts/app-smoke.mjs",
+    "qagent": "node dist/cli.js"
+  },
+  "dependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "electron-updater": "^6.8.11",
+    "exceljs": "^4.4.0",
+    "playwright-core": "^1.64.1"
+  },
+  "devDependencies": {
+    "@babel/parser": "^8.0.10",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/orbitron": "^5.3.0",
+    "@types/node": "^26.6.6",
+    "@types/pngjs": "^6.0.5",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^6.1.2",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1",
+    "electron": "^45.1.0",
+    "electron-builder": "^26.18.0",
+    "esbuild": "^0.28.2",
+    "pixelmatch": "^8.0.0",
+    "pngjs": "^7.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  },
+  "build": {
+    "appId": "com.techovarya.qagent",
+    "productName": "QAgent",
+    "copyright": "Copyright © 2026 Techovarya",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "dist/**/*",
+      "!dist/**/*.map",
+      "build/icon.png",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "node_modules/playwright-core/**"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "artifactName": "QAgent-Setup-${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "QAgent"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "deb",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "category": "Development",
+      "maintainer": "Techovarya <62746132+Hemang67@users.noreply.github.com>",
+      "synopsis": "Tests any web app and records the results in Excel",
+      "artifactName": "QAgent-${version}.${ext}"
+    },
+    "deb": {
+      "artifactName": "qagent_${version}_amd64.${ext}"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Hemang67",
+        "repo": "QAgent",
+        "releaseType": "draft"
+      }
+    ],
+    "electronLanguages": [
+      "en-US"
+    ],
+    "extraResources": [
+      {
+        "from": "demo/site",
+        "to": "demo/site"
+      }
+    ]
+  }
+}

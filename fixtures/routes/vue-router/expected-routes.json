@@ -1,0 +1,10 @@
+{
+  "adapter": "vue",
+  "routes": {
+    "/": "src/views/Home.vue",
+    "/orders": "src/views/Orders.vue",
+    "/orders/:id": "src/views/OrderDetail.vue",
+    "/settings": "src/views/Settings.vue",
+    "/settings/profile": "src/views/Profile.vue"
+  }
+}

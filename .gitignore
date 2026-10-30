@@ -1,0 +1,18 @@
+node_modules/
+dist/
+release/
+test-results/
+*.vsix
+
+# Fixture apps: installed dependencies and build output
+fixtures/*/node_modules/
+fixtures/*/.next/
+fixtures/*/.deps/
+fixtures/*/bin/
+fixtures/*/obj/
+
+# Fixture runs: results and screenshots QAgent writes. The record IDs in
+# .qagent/test-data.*.json are fixture data the tests need, so they are committed.
+fixtures/*/qagent-results.xlsx
+fixtures/*/.qagent/baselines/
+fixtures/*/.qagent/results/

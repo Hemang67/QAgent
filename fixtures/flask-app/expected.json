@@ -1,0 +1,37 @@
+{
+  "setup": "python -m pip install --quiet --target .deps -r requirements.txt",
+  "runs": [
+    {
+      "name": "Smoke + regression, logged in",
+      "args": [
+        "--types",
+        "smoke,regression",
+        "--login",
+        "credentials"
+      ],
+      "env": {
+        "QAGENT_USERNAME": "demo",
+        "QAGENT_PASSWORD": "demo"
+      },
+      "expect": {
+        "Smoke": {
+          "site:/": "passed",
+          "login:/login": "passed",
+          "/dashboard": "passed",
+          "/settings/profile": "passed"
+        },
+        "Full regression": {
+          "/": "passed",
+          "/about": "passed",
+          "/admin": "skipped",
+          "/dashboard": "passed",
+          "/logout": "skipped",
+          "/orders/:order_id": "passed",
+          "/reports": "failed",
+          "/settings/profile": "passed"
+        }
+      }
+    }
+  ],
+  "setupCreates": ".deps"
+}

@@ -1,0 +1,9 @@
+{
+  "adapter": "static",
+  "routes": {
+    "/": "index.html",
+    "/about.html": "about.html",
+    "/docs": "docs/index.html",
+    "/docs/install.html": "docs/install.html"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "shop": {
+      "architect": {
+        "serve": {
+          "options": {
+            "port": 4300
+          }
+        }
+      }
+    }
+  }
+}

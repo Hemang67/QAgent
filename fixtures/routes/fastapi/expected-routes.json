@@ -1,0 +1,10 @@
+{
+  "adapter": "python",
+  "start": "http://127.0.0.1:8000",
+  "startCommand": "uvicorn app.main:app",
+  "routes": {
+    "/": "app/main.py",
+    "/orders/:order_id": "app/main.py",
+    "/admin/users": "app/main.py"
+  }
+}

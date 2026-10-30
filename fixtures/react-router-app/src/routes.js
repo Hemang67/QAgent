@@ -1,0 +1,21 @@
+// Route constants: the adapter must resolve ROUTES.x to these strings
+export const ROUTES = {
+  login: '/login',
+  dashboard: '/dashboard',
+  orders: '/orders',
+  customer: '/customer',
+  reports: '/reports',
+  crash: '/crash',
+  stuck: '/stuck',
+  hang: '/hang',
+  search: '/search',
+  audit: '/audit',
+  admin: '/admin',
+  logout: '/logout',
+  wide: '/wide',
+  links: '/links',
+  slow: '/slow',
+  colors: '/colors',
+  sec: '/sec',
+  guestbook: '/guestbook',
+};

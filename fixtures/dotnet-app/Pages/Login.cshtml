@@ -1,0 +1,9 @@
+@page
+@model LoginModel
+<h1>Sign in</h1>
+<form method="post">
+  <input name="Username" />
+  <input name="Password" type="password" />
+  <button type="submit">Sign in</button>
+</form>
+@if (Model.Failed) { <p>Wrong username or password</p> }

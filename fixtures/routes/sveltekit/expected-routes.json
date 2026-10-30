@@ -1,0 +1,10 @@
+{
+  "adapter": "svelte",
+  "routes": {
+    "/": "src/routes/+page.svelte",
+    "/orders": "src/routes/orders/+page.svelte",
+    "/orders/:id": "src/routes/orders/[id]/+page.svelte",
+    "/settings": "src/routes/(app)/settings/+page.svelte",
+    "/docs/:lang?": "src/routes/docs/[[lang]]/+page.svelte"
+  }
+}

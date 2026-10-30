@@ -1,0 +1,10 @@
+{
+  "framework": "dotnet",
+  "local": { "start": "dotnet run", "url": "http://localhost:5182" },
+  "login": { "path": "/Login", "loggedInPath": "/Dashboard" },
+  "pages": {
+    "/Orders/Details/:id": { "params": { "id": "orderId" } },
+    "/reports/yearly/:year": { "params": { "year": "year" } }
+  },
+  "readiness": { "readyTimeoutMs": 10000 }
+}

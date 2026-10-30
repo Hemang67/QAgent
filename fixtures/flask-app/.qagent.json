@@ -1,0 +1,7 @@
+{
+  "framework": "python",
+  "local": { "start": "python app.py", "url": "http://127.0.0.1:5181" },
+  "login": { "path": "/login", "loggedInPath": "/dashboard" },
+  "pages": { "/orders/:order_id": { "params": { "order_id": "orderId" } } },
+  "readiness": { "readyTimeoutMs": 8000 }
+}

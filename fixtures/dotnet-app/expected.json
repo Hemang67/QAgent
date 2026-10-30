@@ -1,0 +1,26 @@
+{
+  "setup": "dotnet build --nologo -v q",
+  "setupCreates": "bin",
+  "runs": [
+    {
+      "name": "Smoke + regression, logged in",
+      "args": ["--types", "smoke,regression", "--login", "credentials"],
+      "env": { "QAGENT_USERNAME": "demo", "QAGENT_PASSWORD": "demo" },
+      "expect": {
+        "Smoke": { "site:/": "passed", "login:/Login": "passed", "/Dashboard": "passed", "/Reports": "passed" },
+        "Full regression": {
+          "/": "passed",
+          "/About": "passed",
+          "/Admin": "skipped",
+          "/Broken": "failed",
+          "/Dashboard": "passed",
+          "/Logout": "skipped",
+          "/Orders": "passed",
+          "/Orders/Details/:id": "passed",
+          "/Reports": "passed",
+          "/reports/yearly/:year": "passed"
+        }
+      }
+    }
+  ]
+}

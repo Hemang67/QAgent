@@ -1,0 +1,19 @@
+{
+  "adapter": "dotnet",
+  "start": "http://localhost:5182",
+  "startCommand": "dotnet run",
+  "envs": { "local": { "url": "http://localhost:5182" } },
+  "routes": {
+    "/": "Pages/Index.cshtml",
+    "/About": "Pages/About.cshtml",
+    "/Admin": "Pages/Admin.cshtml",
+    "/Broken": "Pages/Broken.cshtml",
+    "/Dashboard": "Pages/Dashboard.cshtml",
+    "/Login": "Pages/Login.cshtml",
+    "/Logout": "Pages/Logout.cshtml",
+    "/Orders": "Pages/Orders/Index.cshtml",
+    "/Orders/Details/:id": "Pages/Orders/Details.cshtml",
+    "/Reports": "Controllers/ReportsController.cs",
+    "/reports/yearly/:year": "Controllers/ReportsController.cs"
+  }
+}

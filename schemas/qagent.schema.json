@@ -1,0 +1,428 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "QAgent project settings",
+  "description": "Shared settings for QAgent. Commit this file. It never holds credentials.",
+  "type": "object",
+  "additionalProperties": false,
+  "definitions": {
+    "env": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Site URL for this environment"
+        },
+        "apiUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "API origin, when the API is on another domain"
+        }
+      }
+    },
+    "paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^/"
+      }
+    },
+    "step": {
+      "type": "object",
+      "description": "One recorded action. {{name}} in a value becomes the unique QAgent-… name of a CRUD run",
+      "oneOf": [
+        {
+          "required": [
+            "goto"
+          ],
+          "properties": {
+            "goto": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "click"
+          ],
+          "properties": {
+            "click": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "fill",
+            "value"
+          ],
+          "properties": {
+            "fill": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "select",
+            "value"
+          ],
+          "properties": {
+            "select": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "check"
+          ],
+          "properties": {
+            "check": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "press",
+            "key"
+          ],
+          "properties": {
+            "press": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "expectText"
+          ],
+          "properties": {
+            "expectText": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "required": [
+            "expectUrl"
+          ],
+          "properties": {
+            "expectUrl": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/step"
+      }
+    }
+  },
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "framework": {
+      "type": "string",
+      "enum": [
+        "react-router",
+        "nextjs",
+        "vue",
+        "nuxt",
+        "angular",
+        "svelte",
+        "static",
+        "laravel",
+        "dotnet",
+        "python",
+        "crawl"
+      ]
+    },
+    "local": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "type": "string",
+          "description": "Command that starts the app locally"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "apiUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    },
+    "environments": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dev": {
+          "$ref": "#/definitions/env"
+        },
+        "test": {
+          "$ref": "#/definitions/env"
+        },
+        "live": {
+          "$ref": "#/definitions/env"
+        }
+      }
+    },
+    "login": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "path": {
+          "type": "string",
+          "pattern": "^/",
+          "default": "/login"
+        },
+        "loggedInPath": {
+          "type": "string",
+          "pattern": "^/",
+          "description": "A URL path that means you are logged in"
+        },
+        "logoutPath": {
+          "type": "string",
+          "pattern": "^/",
+          "description": "Opened at the end of a run to end the session on the server"
+        },
+        "accountSelector": {
+          "type": "string",
+          "description": "CSS selector of the element showing the logged-in user's name (Run History)"
+        }
+      }
+    },
+    "lists": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "smoke": {
+          "$ref": "#/definitions/paths",
+          "description": "Smoke pages. Empty = top menu pages chosen at run time"
+        },
+        "criticalFlows": {
+          "type": "array",
+          "description": "Critical journeys, step by step",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "steps"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "steps": {
+                "$ref": "#/definitions/steps"
+              },
+              "allowWrites": {
+                "type": "boolean",
+                "default": false,
+                "description": "Let this flow save data (never on Live; blocked endpoints stay blocked)"
+              }
+            }
+          }
+        },
+        "crud": {
+          "type": "array",
+          "description": "Screens where CRUD creates, edits and deletes a QAgent-… record",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "name",
+              "route",
+              "create",
+              "delete"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "route": {
+                "type": "string",
+                "pattern": "^/"
+              },
+              "create": {
+                "$ref": "#/definitions/steps"
+              },
+              "edit": {
+                "$ref": "#/definitions/steps"
+              },
+              "delete": {
+                "$ref": "#/definitions/steps"
+              }
+            }
+          }
+        }
+      }
+    },
+    "pages": {
+      "type": "object",
+      "description": "Per-page settings, keyed by path pattern",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "params": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Path parameter → key in .qagent/test-data.<env>.json"
+          },
+          "skip": {
+            "type": "string",
+            "description": "Never open this page; the reason is shown in results"
+          }
+        }
+      }
+    },
+    "discovery": {
+      "type": "string",
+      "enum": [
+        "auto",
+        "crawl"
+      ],
+      "default": "auto"
+    },
+    "crawlLimit": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 300
+    },
+    "blockedEndpoints": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Endpoints that email, ship, book or charge. Blocked in every test type, CRUD included"
+    },
+    "readOnlyAllow": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^(POST|PUT|PATCH|DELETE) /"
+      },
+      "description": "Non-GET calls that only read data, e.g. \"POST /api/orders/search\". GraphQL queries are allowed automatically; mutations stay blocked"
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "readyWarnMs": {
+          "type": "integer",
+          "default": 5000
+        },
+        "readyFailMs": {
+          "type": "integer",
+          "default": 15000
+        },
+        "apiWarnMs": {
+          "type": "integer",
+          "default": 3000
+        },
+        "lcpWarnMs": {
+          "type": "integer",
+          "default": 4000
+        }
+      }
+    },
+    "readiness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "contentSelector": {
+          "type": "string"
+        },
+        "loaderSelector": {
+          "type": "string"
+        },
+        "quietWindowMs": {
+          "type": "integer",
+          "default": 750
+        },
+        "readyTimeoutMs": {
+          "type": "integer",
+          "default": 30000
+        },
+        "maxTabDepth": {
+          "type": "integer",
+          "default": 3
+        }
+      }
+    },
+    "workers": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "default": 3
+    },
+    "results": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "default": "qagent-results.xlsx"
+        }
+      }
+    },
+    "visual": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.005,
+          "description": "Share of pixels that may change before a page fails"
+        },
+        "mask": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Selectors hidden in screenshots (dates, counters)"
+        }
+      }
+    },
+    "baseBranch": {
+      "type": "string",
+      "description": "Change-impact compares with this branch (default origin/development, then origin/main)"
+    }
+  }
+}

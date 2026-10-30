@@ -1,0 +1,19 @@
+{
+  "adapter": "laravel",
+  "envs": {
+    "local": {
+      "url": "http://shop.test"
+    }
+  },
+  "routes": {
+    "/": null,
+    "/about": "resources/views/pages/about.blade.php",
+    "/orders/:order": "app/Http/Controllers/OrderController.php",
+    "/contact": "app/Http/Controllers/OrderController.php",
+    "/photos": "app/Http/Controllers/PhotoController.php",
+    "/photos/:photo": "app/Http/Controllers/PhotoController.php",
+    "/admin/users": "app/Http/Controllers/OrderController.php",
+    "/admin/reports/sales": "app/Http/Controllers/OrderController.php",
+    "/after-groups": "app/Http/Controllers/OrderController.php"
+  }
+}

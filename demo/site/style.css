@@ -1,0 +1,6 @@
+body { font: 15px/1.5 system-ui, sans-serif; margin: 0; color: #1d2733; }
+nav { background: #1f3a5f; padding: 12px 24px; }
+nav a { color: #fff; margin-right: 18px; text-decoration: none; }
+main { padding: 24px; max-width: 900px; }
+table { border-collapse: collapse; width: 100%; }
+th, td { border-bottom: 1px solid #ddd; padding: 8px; text-align: left; }

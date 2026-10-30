@@ -1,0 +1,50 @@
+name: release
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    permissions:
+      contents: write # attach installers to the GitHub Release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20, cache: npm }
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      # Windows signing (SignPath Foundation) goes here once the project is approved
+      # Builds the host's targets (NSIS on Windows, AppImage + .deb on Linux) into a draft release
+      - run: npx electron-builder --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Both platforms are uploaded: publish the release with its notes, so installed copies see it
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Release notes from CHANGELOG.md
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '/^## /{p = index($0, "## " v) == 1; next} p' CHANGELOG.md > notes.md
+          printf '\n---\nDownload the installer for your system below. Installed copies update themselves.\nThe Windows installer is not code-signed yet: if Windows shows "Windows protected your PC", choose More info, then Run anyway.\n' >> notes.md
+          cat notes.md
+      - name: Publish, with checksums
+        run: |
+          gh release edit "$GITHUB_REF_NAME" --draft=false --latest --notes-file notes.md
+          mkdir files && cd files
+          gh release download "$GITHUB_REF_NAME" -p '*.exe' -p '*.AppImage' -p '*.deb'
+          sha256sum * > SHA256SUMS
+          gh release upload "$GITHUB_REF_NAME" SHA256SUMS --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

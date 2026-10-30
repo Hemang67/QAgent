@@ -1,0 +1,24 @@
+{
+  "adapter": "angular",
+  "start": "http://localhost:4300",
+  "envs": {
+    "local": {
+      "apiUrl": "http://localhost:5000"
+    },
+    "dev": {
+      "url": "https://dev.shop.example",
+      "apiUrl": "https://dev-api.shop.example"
+    },
+    "live": {
+      "url": "https://shop.example",
+      "apiUrl": "https://api.shop.example"
+    }
+  },
+  "routes": {
+    "/": "src/app/home/home.component.ts",
+    "/orders": "src/app/orders/orders.component.ts",
+    "/orders/:id": "src/app/orders/order-detail.component.ts",
+    "/admin/users": "src/app/admin/users.component.ts",
+    "/admin/audit": "src/app/admin/audit.component.ts"
+  }
+}

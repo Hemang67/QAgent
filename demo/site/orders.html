@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Demo Shop · Orders</title><link rel="stylesheet" href="/style.css"></head>
+<body><nav><a href="/">Home</a><a href="/products.html">Products</a><a href="/orders.html">Orders</a><a href="/about.html">About</a><a href="/contact.html">Contact</a></nav><main><h1>Orders</h1>
+<p>Loading orders…</p><table><thead><tr><th>Order</th><th>Customer</th></tr></thead><tbody id="rows"></tbody></table>
+<script>
+  // Planted defect for the tour: a script error while building the table
+  const orders = undefined;
+  document.getElementById("rows").innerHTML = orders.map((o) => `<tr><td>${o.id}</td><td>${o.name}</td></tr>`).join("");
+</script>
+</main></body></html>

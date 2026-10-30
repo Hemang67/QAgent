@@ -1,0 +1,5 @@
+# Store text with LF line endings, whatever the local git settings
+* text=auto eol=lf
+*.png binary
+*.ico binary
+*.xlsx binary
