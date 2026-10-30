@@ -83,7 +83,7 @@ Pages are read from the code for:
 | .NET | Razor Pages, Blazor `@page`, MVC controllers |
 | Python | Django `urls.py`, Flask routes and blueprints, FastAPI pages |
 
-Any other web project is crawled from its home page. Pages that need a record ID (`/orders/:id`, `?orderId=`) read it from `.qagent/test-data.<env>.json`, which stays on your machine.
+React, Next.js, Vue / Nuxt, Angular and SvelteKit are all Node.js projects: QAgent starts them with their own npm script. Server-rendered Node.js apps (Express, NestJS, Fastify, Koa) and any other web project are crawled from the home page after login. Pages that need a record ID (`/orders/:id`, `?orderId=`) read it from `.qagent/test-data.<env>.json`, which stays on your machine.
 
 On the **Pages** screen, **New since the base branch** finds pages and risky calls added on your branch and asks how to test them. It can also turn on a commit reminder for your clone.
 
