@@ -385,3 +385,48 @@ table.data td.num { text-align: right; font-family: var(--mono); font-variant-nu
 .boot { background: #05080f; }
 .boot-line { color: #7dffcf; }
 .boot-line span { color: #22ffa0; }
+
+/* ── Layout and responsiveness ───────────────────────────────── */
+/* Use wide windows: content grows to 1440 px before centring */
+.page { max-width: 1440px; }
+/* The sidebar scrolls when the window is short, so nothing at its bottom is cut off */
+.sidebar { overflow-y: auto; overflow-x: hidden; min-height: 0; }
+.sidebar .spacer { min-height: 12px; }
+/* Tables scroll sideways inside their card instead of being clipped */
+.card.flush { overflow-x: auto; overflow-y: hidden; }
+table.data { min-width: 640px; }
+table.data th, table.data td.num, table.data td.nowrap { white-space: nowrap; }
+table.data .details { min-width: 240px; }
+/* Scan header: title, verdict and clock together; actions on the right */
+.scan-title { flex-wrap: wrap; row-gap: 6px; }
+.scan-title .clock { margin-left: 6px; }
+.scan-actions { justify-content: flex-end; }
+/* Scan tiles: labels stay on one line; two rows of two when space is tight */
+.telemetry .tile .label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+@media (max-width: 1280px) {
+  .telemetry { grid-template-columns: repeat(2, 1fr); }
+  .scan-grid { grid-template-columns: 300px 1fr; }
+}
+@media (max-width: 1100px) {
+  .app { grid-template-columns: 204px 1fr; }
+  .page { padding: 24px 22px 44px; }
+  .brand-name { font-size: 15px; letter-spacing: 0.18em; }
+  .tiles { gap: 8px; }
+  .tile { padding: 10px 12px; }
+  .tile .value { font-size: 24px; }
+  .grid-2 { gap: 10px 12px; }
+}
+@media (max-height: 720px) {
+  .sidebar { padding-top: 12px; gap: 1px; }
+  .brand { padding-bottom: 2px; }
+  .sys-status { padding-bottom: 8px; }
+  .project-chip { margin-bottom: 8px; padding: 8px 10px; }
+  .nav-item { padding: 7px 12px; }
+}
+/* One line each: navigation labels and card titles shorten with an ellipsis instead of wrapping */
+.nav-item { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.radar-card > .label { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 1100px) {
+  .nav-item { letter-spacing: 0.04em; padding-left: 10px; padding-right: 8px; }
+}

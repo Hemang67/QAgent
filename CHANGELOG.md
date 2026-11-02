@@ -4,6 +4,7 @@
 
 - Open in Excel works on Windows: when the system refuses to open the workbook directly, QAgent opens it through Explorer, as a double-click would.
 - Results and Run screens: a Show in folder button next to Open in Excel, and an error message if a workbook cannot be opened.
+- Layout fixes at every window size: tables scroll sideways instead of cutting columns off, the sidebar scrolls in short windows, wide windows use up to 1440 px, the scan view keeps its clock beside the title and its tiles readable when narrow, and labels no longer wrap.
 
 ## 0.1.0 — 2026-10-30
 

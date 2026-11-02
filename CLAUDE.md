@@ -12,6 +12,7 @@ npm run test:e2e   # every runnable fixture + recorder-check + security-check, ~
 npm run test:app   # drives the Electron window; QAGENT_APP_EXE=<QAgent.exe> tests a packaged build
 npm run dist       # electron-builder installers into release/
 node scripts/e2e-fixtures.mjs <name>   # one fixture only, e.g. flask
+node scripts/ui-sizes.mjs   # screenshots of every screen at 1536×830, 1280×760 and the 960×620 minimum (test-results/sizes)
 ```
 
 Run `npm run build` (or `node scripts/build.mjs --no-ui`) before the e2e scripts: they use `dist/cli.js`.

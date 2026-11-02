@@ -213,7 +213,7 @@ export default function Results({ project, sheet, onSheet }: { project: ProjectV
             <tbody>
               {history.map((h, i) => (
                 <tr key={i} className={h.sheet ? 'clickable' : ''} onClick={() => h.sheet && onSheet(h.sheet)} title={h.sheet ? 'Show this run' : 'Skipped: no sheet'}>
-                  <td>{h.runTime}</td>
+                  <td className="nowrap">{h.runTime}</td>
                   <td>{h.env}</td>
                   <td>{h.type}</td>
                   <td>

@@ -252,11 +252,11 @@ function Progress({ project, run, onCancel, onNew, onResults }: { project: Proje
         <div className={`scan-title ${running ? '' : 'done'}`}>
           <h1>{running ? (run.cancelling ? 'Aborting scan' : 'Scan in progress') : run.cancelled ? 'Scan aborted' : 'Scan complete'}</h1>
           {!running && <span className={`verdict ${verdict}`}>{verdict === 'passed' ? 'All clear' : verdict === 'failed' ? 'Defects found' : verdict}</span>}
-        </div>
-        <div className="row">
           <span className="clock" aria-label="Elapsed time">
             T+{clock(elapsed)}
           </span>
+        </div>
+        <div className="row scan-actions">
           {running ? (
             <button className="btn danger" onClick={onCancel} disabled={run.cancelling}>
               {run.cancelling ? 'Aborting…' : '■ Abort'}

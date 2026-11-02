@@ -43,7 +43,7 @@ export default function Pages({ project, onSaved }: { project: ProjectView; onSa
                     <td>
                       <FileLink file={r.file} onOpen={(f) => api.openFile(project.root, f)} />
                     </td>
-                    <td className="muted">{HOW[r.source]}</td>
+                    <td className="muted nowrap">{HOW[r.source]}</td>
                     <td>
                       {r.params.map((p) => {
                         const key = keyFor(r.path, p);
