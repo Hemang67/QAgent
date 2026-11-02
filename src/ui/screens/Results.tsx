@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { HistoryRow, ProjectView, SheetView } from '../../shared/ipc';
 import type { PageResult } from '../../shared/types';
 import { api } from '../api';
-import { FileLink, Notice, PageHead, Result, Tiles } from '../components';
+import { FileLink, Notice, PageHead, Result, Tiles, WorkbookButtons } from '../components';
 
 const FILTERS: (PageResult | 'all')[] = ['all', 'failed', 'unverified', 'skipped', 'passed'];
 
@@ -90,9 +90,7 @@ export default function Results({ project, sheet, onSheet }: { project: ProjectV
           <button className="btn" onClick={() => onSheet(null)}>
             ← All runs
           </button>
-          <button className="btn" onClick={() => api.openResults(project.root)}>
-            Open in Excel
-          </button>
+          <WorkbookButtons root={project.root} />
         </PageHead>
         {approveBar}
         {approvedNote}
@@ -189,11 +187,7 @@ export default function Results({ project, sheet, onSheet }: { project: ProjectV
   return (
     <div className="page">
       <PageHead title="Results" subtitle={project.resultsFile}>
-        {history && history.length > 0 && (
-          <button className="btn" onClick={() => api.openResults(project.root)}>
-            Open in Excel
-          </button>
-        )}
+        {history && history.length > 0 && <WorkbookButtons root={project.root} />}
       </PageHead>
       {approveBar}
       {approvedNote}

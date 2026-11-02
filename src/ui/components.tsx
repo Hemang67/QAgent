@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import type { PageResult } from '../shared/types';
+import { api } from './api';
 import logo from './assets/logo.png';
 import mark from './assets/mark.png';
 
@@ -65,5 +66,26 @@ export function Boot() {
         </div>
       </div>
     </div>
+  );
+}
+
+/** Open in Excel and Show in folder for a project's workbook; a failure is shown, not dropped. */
+export function WorkbookButtons({ root }: { root: string }) {
+  const [error, setError] = useState('');
+  const open = async () => {
+    setError('');
+    const err = await api.openResults(root);
+    if (err) setError(`Could not open the workbook: ${err}`);
+  };
+  return (
+    <>
+      <button className="btn" onClick={open}>
+        Open in Excel
+      </button>
+      <button className="btn" onClick={() => api.showResults(root)}>
+        Show in folder
+      </button>
+      {error && <span className="res failed" style={{ minWidth: 0, textTransform: 'none', letterSpacing: 0 }}>{error}</span>}
+    </>
   );
 }

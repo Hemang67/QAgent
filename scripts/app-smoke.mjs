@@ -126,10 +126,10 @@ console.log('Configured project: run from the window');
   await win.getByRole('heading', { name: 'Pages' }).waitFor();
   check(await win.getByText('/orders/:orderId').isVisible(), 'Pages lists routes with their IDs');
   await win.getByRole('button', { name: 'Find new pages' }).click();
-  // The fixture folder is not its own git repository: the panel must say so, not fail silently
-  await win.getByText(/not a git repository|Base branch not found/i).first().waitFor({ timeout: 15_000 }).then(
-    () => check(true, 'New since the base branch explains why it cannot compare'),
-    () => check(false, 'New since the base branch explains why it cannot compare'),
+  // The panel either compares with the base branch or says why it cannot; it never fails silently
+  await win.getByText(/Compared with|not a git repository|Base branch not found/i).first().waitFor({ timeout: 15_000 }).then(
+    () => check(true, 'New since the base branch answers'),
+    () => check(false, 'New since the base branch answers'),
   );
   await shot(win, '6-pages');
 

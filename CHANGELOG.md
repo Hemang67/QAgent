@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 — 2026-11-02
+
+- Open in Excel works on Windows: when the system refuses to open the workbook directly, QAgent opens it through Explorer, as a double-click would.
+- Results and Run screens: a Show in folder button next to Open in Excel, and an error message if a workbook cannot be opened.
+
 ## 0.1.0 — 2026-10-30
 
 The first public release.

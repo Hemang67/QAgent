@@ -164,7 +164,10 @@ export interface QAgentApi {
   onRunEvent(cb: (e: RunEvent) => void): () => void;
   readHistory(root: string): Promise<HistoryRow[]>;
   readSheet(root: string, sheet: string): Promise<SheetView | null>;
+  /** Opens the results workbook in Excel; returns an error text, or null */
   openResults(root: string): Promise<string | null>;
+  /** Shows the results workbook in the file manager */
+  showResults(root: string): Promise<void>;
   openFile(root: string, file: string): Promise<string | null>;
   getSettings(): Promise<AppSettings>;
   saveSettings(s: AppSettings): Promise<void>;

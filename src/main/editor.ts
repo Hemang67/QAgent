@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { shell } from 'electron';
+import { openWithSystem } from './open';
 import type { EditorChoice } from '../shared/ipc';
 
 // Command-line launchers that accept "file:line"
@@ -32,6 +32,5 @@ export const openInEditor = async (root: string, file: string, editor: EditorCho
     });
     if (started) return null;
   }
-  const err = await shell.openPath(abs);
-  return err || null;
+  return openWithSystem(abs);
 };

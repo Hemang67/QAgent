@@ -30,6 +30,7 @@ const api: QAgentApi = {
   readHistory: invoke('readHistory') as QAgentApi['readHistory'],
   readSheet: invoke('readSheet') as QAgentApi['readSheet'],
   openResults: invoke('openResults') as QAgentApi['openResults'],
+  showResults: invoke('showResults') as QAgentApi['showResults'],
   openFile: invoke('openFile') as QAgentApi['openFile'],
   getSettings: invoke('getSettings') as QAgentApi['getSettings'],
   saveSettings: invoke('saveSettings') as QAgentApi['saveSettings'],

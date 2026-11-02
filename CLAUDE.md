@@ -45,6 +45,7 @@ These are product guarantees, enforced in more than one layer on purpose (UI, pl
 - **Fixture state:** the React fixture's mock API keeps data in memory while its Vite server runs. Use `POST /api/test/reset` before tests that create data; a stray server on port 5179 makes runs see old data.
 - **`npm run test:app` opens real windows.** A click or a covering window can disturb it; the script restores minimised windows and passes occlusion flags.
 - `fixtures/routes/*` is generated: edit `scripts/make-route-fixtures.mjs` and rerun it, not the files.
+- **`shell.openPath` fails for Office files on Windows** ("Failed to open path": their open command uses DDE). Open files with `openWithSystem()` (`src/main/open.ts`), which falls back to Explorer, and show the returned error in the UI.
 - `exceljs` `Worksheet.orderNo` exists at runtime but not in its types (cast).
 
 ## First run, what's new, updates

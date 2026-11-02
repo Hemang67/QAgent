@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { BrowserStatus, ProjectView, RunLogin } from '../../shared/ipc';
 import { ENV_LABEL, ENV_NAMES, IMPLEMENTED_TYPES, TEST_TYPE_LABEL, TYPE_ENVS, type EnvName, type LoginMode, type TestType } from '../../shared/types';
 import { api } from '../api';
-import { FileLink, Notice, PageHead, Result } from '../components';
+import { FileLink, Notice, PageHead, Result, WorkbookButtons } from '../components';
 import type { RunState } from '../runState';
 import { Lanes, Radar, RadarLegend, Targets, Terminal, clock, useNow } from '../scan';
 
@@ -263,11 +263,7 @@ function Progress({ project, run, onCancel, onNew, onResults }: { project: Proje
             </button>
           ) : (
             <>
-              {run.workbook && (
-                <button className="btn" onClick={() => api.openResults(project.root)}>
-                  Open in Excel
-                </button>
-              )}
+              {run.workbook && <WorkbookButtons root={project.root} />}
               {run.workbook && (
                 <button className="btn" data-tour="view-results" onClick={() => onResults(run.workbook!.sheets[0] ?? null)}>
                   View results

@@ -8,6 +8,7 @@ import { openInEditor } from './editor';
 import { projectView, saveProjectConfig, validateConfig } from './project';
 import { readHistory, readSheet } from './results';
 import { RunManager } from './run';
+import { openWithSystem } from './open';
 import { startDemo, stopDemo } from './demo';
 import { changelog, newer, Updater } from './updater';
 import { record, type RecordKind } from './recorder';
@@ -138,7 +139,12 @@ const registerIpc = () => {
   handle('openResults', async (root: string) => {
     const file = resultsFile(root);
     if (!fs.existsSync(file)) return 'No results yet: run tests first';
-    return (await shell.openPath(file)) || null;
+    return openWithSystem(file);
+  });
+  handle('showResults', (root: string) => {
+    const file = resultsFile(root);
+    if (fs.existsSync(file)) shell.showItemInFolder(file);
+    else shell.openPath(root);
   });
   handle('openFile', (root: string, file: string) => openInEditor(root, file, getSettings().editor));
   handle('getSettings', () => getSettings());
