@@ -2,7 +2,7 @@
   "name": "qagent",
   "productName": "QAgent",
   "description": "Desktop app that tests any web app: finds the pages, opens each in a real browser, and records health, speed, accessibility and security problems in an Excel workbook.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": {
     "name": "Techovarya",
     "email": "62746132+Hemang67@users.noreply.github.com",
