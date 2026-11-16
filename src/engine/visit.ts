@@ -8,6 +8,7 @@ import { checkResponsive } from './checks/responsive';
 import { checkVisual } from './checks/visual';
 import { PageMonitor, type MonitorOptions, type NetworkEvent } from './monitor';
 import { contentRoot, guardDialogs, inspectContent, waitForReady } from './readiness';
+import type { RecordFinder } from './find-records';
 import type { PageRecord } from './records';
 import { exploreTabs } from './tabs';
 
@@ -25,6 +26,8 @@ export interface VisitOptions {
   collectLinks: boolean;
   /** The test type's own check, run on every page that rendered */
   checks?: PageChecks;
+  /** Looks for record IDs on the page once it is checked (pages waiting for test data) */
+  records?: RecordFinder | null;
 }
 
 export interface PageChecks {
@@ -251,6 +254,8 @@ export const visitPage = async (context: BrowserContext, p: PlannedPage, o: Visi
       }
     }
     rec.durationMs = Date.now() - started;
+    // Last, because opening a record navigates the page away
+    if (o.records && rendered && !toLogin) await o.records.collect(page, p.route).catch(() => {});
     return { records, links, menuLinks };
   } catch (e) {
     // A QAgent or browser problem (crashed tab, closed context): not a verdict on the page

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.2 — 2026-11-16
+
+- Pages that need a record ID no longer stay unverified when you have not set one. QAgent reads your project's code to find the list pages that open each one. During the run it opens the first record there (a link, or the first table row) and tests the page the app opened. The Pages screen shows where each page's record will come from. Results say which list the record came from, or where QAgent looked when it found none. IDs you set in test data still come first; `"findRecords": false` in `.qagent.json` turns this off.
+- The results workbook is readable in Excel's dark mode: every row now has its own fill, so text no longer sits on black. Workbooks from earlier runs are repaired on the next run.
+
 ## 0.1.1 — 2026-11-02
 
 - Open in Excel works on Windows: when the system refuses to open the workbook directly, QAgent opens it through Explorer, as a double-click would.

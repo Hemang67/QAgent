@@ -43,6 +43,7 @@ const api: QAgentApi = {
   approveBaselines: invoke('approveBaselines') as QAgentApi['approveBaselines'],
   pendingBaselines: invoke('pendingBaselines') as QAgentApi['pendingBaselines'],
   newPages: invoke('newPages') as QAgentApi['newPages'],
+  recordSources: invoke('recordSources') as QAgentApi['recordSources'],
   saveTestData: invoke('saveTestData') as QAgentApi['saveTestData'],
   reminderStatus: invoke('reminderStatus') as QAgentApi['reminderStatus'],
   installReminder: invoke('installReminder') as QAgentApi['installReminder'],

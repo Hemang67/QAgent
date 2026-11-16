@@ -16,6 +16,7 @@ import { approveBaselines, countPending } from '../engine/checks/visual';
 import type { EnvName } from '../shared/types';
 import { findNewPages } from '../planner/new-pages';
 import { inspectProject } from '../planner/plan';
+import { recordSources } from '../planner/record-sources';
 import { installReminder, reminderStatus } from '../planner/reminder';
 import { readTestData } from '../shared/config';
 import { forgetProject, getSettings, listProjects, rememberProject, saveSettings } from './store';
@@ -170,6 +171,7 @@ const registerIpc = () => {
       return { ok: false, error: (e as Error).message.split('\n')[0] };
     }
   });
+  handle('recordSources', (root: string) => recordSources(root, inspectProject(root).routes));
   handle('saveTestData', (root: string, env: EnvName, data: Record<string, string>) => {
     const dir = path.join(root, '.qagent');
     fs.mkdirSync(dir, { recursive: true });

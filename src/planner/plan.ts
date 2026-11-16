@@ -4,6 +4,7 @@ import os from 'os';
 import path from 'path';
 import { detectAdapter } from '../adapters';
 import { changeImpact } from './impact';
+import { recordSources } from './record-sources';
 import { DEFAULT_BUDGETS, DEFAULT_READINESS, readConfig, readTestData, type QAgentConfig } from '../shared/config';
 import {
   IMPLEMENTED_TYPES,
@@ -111,6 +112,7 @@ export const planPage = (r: RouteInfo, baseUrl: string, config: QAgentConfig, te
     file: r.file,
     url: missing.length ? null : new URL(p + (qs ? `?${qs}` : ''), baseUrl).toString(),
     missing: missing.length ? `Needs a record ID: set ${missing.join(', ')} in .qagent/test-data.${env}.json` : undefined,
+    params: missing.length ? r.params : undefined,
     skip: pageCfg.skip,
     exploreTabs: true,
   };
@@ -166,6 +168,7 @@ export const buildPlan = (info: ProjectInfo, choices: RunChoices): RunPlan => {
   const impact = choices.types.includes('impact') ? changeImpact(root, info.routes, choices.baseBranch ?? config.baseBranch) : null;
 
   const jobs: RunJob[] = [];
+  let sources: ReturnType<typeof recordSources> | null = null;
   const logins: RunPlan['logins'] = {};
   const lowLogins: RunPlan['lowLogins'] = {};
   for (const env of choices.envs) {
@@ -176,6 +179,12 @@ export const buildPlan = (info: ProjectInfo, choices: RunChoices): RunPlan => {
     const pages = info.routes
       .filter((r) => r.path.toLowerCase() !== loginPath.toLowerCase())
       .map((r) => planPage(r, baseUrl, config, testData, env));
+    // Pages without a record ID: where the project's code opens them, so the run can open a record there
+    if (config.findRecords !== false && pages.some((p) => p.missing)) {
+      sources ??= recordSources(root, info.routes);
+      const urlOf = new Map(pages.map((p) => [p.route, p.url]));
+      for (const p of pages) if (p.missing) p.recordFrom = (sources[p.route] ?? []).map((s) => ({ ...s, url: urlOf.get(s.route) ?? null }));
+    }
     const choice = choices.logins[env] ?? { mode: 'skip' as const };
     logins[env] = {
       ...choice,
@@ -196,6 +205,7 @@ export const buildPlan = (info: ProjectInfo, choices: RunChoices): RunPlan => {
         pages,
         crawl: info.routes.length === 0,
         crawlLimit: config.crawlLimit ?? 300,
+        findRecords: config.findRecords !== false,
         smokeList: config.lists?.smoke ?? [],
       };
       if (type === 'impact' && impact) {

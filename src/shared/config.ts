@@ -29,6 +29,8 @@ export interface QAgentConfig {
   /** "auto": adapter routes, crawl when none found. "crawl": always crawl */
   discovery?: 'auto' | 'crawl';
   crawlLimit?: number;
+  /** Open the first record on list pages to fill missing record IDs (default true) */
+  findRecords?: boolean;
   blockedEndpoints?: string[];
   readOnlyAllow?: string[];
   budgets?: Partial<Budgets>;

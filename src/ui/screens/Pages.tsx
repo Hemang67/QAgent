@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ProjectView } from '../../shared/ipc';
 import { ENV_LABEL, ENV_NAMES } from '../../shared/types';
 import { api } from '../api';
@@ -13,6 +13,14 @@ export default function Pages({ project, onSaved }: { project: ProjectView; onSa
   const pages = useMemo(() => project.routes.filter((r) => r.path.toLowerCase().includes(query.toLowerCase()) || (r.file ?? '').toLowerCase().includes(query.toLowerCase())), [project.routes, query]);
   const envs = ENV_NAMES.filter((e) => project.urls[e]);
   const keyFor = (route: string, param: string) => project.config.pages?.[route]?.params?.[param.replace(/^\?/, '')] ?? param.replace(/^\?/, '');
+  // Where a run opens a record when no ID is set: read from the project's code
+  const finding = project.config.findRecords !== false;
+  const [sources, setSources] = useState<Record<string, { route: string; file: string }[]> | null>(null);
+  useEffect(() => {
+    setSources(null);
+    if (finding && project.routes.some((r) => r.params.length)) api.recordSources(project.root).then(setSources, () => setSources({}));
+  }, [project.root, project.routes, finding]);
+  const unset = (route: string, params: string[]) => envs.some((e) => params.some((p) => !project.testDataKeys[e]?.includes(keyFor(route, p))));
 
   return (
     <div className="page">
@@ -58,6 +66,17 @@ export default function Pages({ project, onSaved }: { project: ProjectView; onSa
                           </div>
                         );
                       })}
+                      {finding && r.params.length > 0 && unset(r.path, r.params) && (
+                        <div className="small muted" style={{ marginTop: 4 }}>
+                          {!sources ? (
+                            'Looking in the code for the pages that open it…'
+                          ) : sources[r.path]?.length ? (
+                            <span title={sources[r.path].map((s) => `${s.route}: ${s.file}`).join('\n')}>Without an ID, a run opens the first record on {sources[r.path].map((s) => s.route).join(', ')}</span>
+                          ) : (
+                            'No page in the code opens it with an ID: a run tries the first row of the lists it tests'
+                          )}
+                        </div>
+                      )}
                     </td>
                   </tr>
                 );

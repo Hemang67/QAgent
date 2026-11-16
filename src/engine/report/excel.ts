@@ -109,7 +109,8 @@ const writeSection = (ws: Worksheet, tableName: string, startRow: number, title:
       cell.font = font();
       cell.alignment = { vertical: 'top', wrapText: !!c.wrap, horizontal: c.center ? 'center' : 'left' };
       cell.border = { bottom: thin };
-      if (idx % 2 === 1) cell.fill = solid(C.band);
+      // Every row gets a fill: Excel's dark mode paints unfilled cells black under dark text
+      cell.fill = solid(idx % 2 === 1 ? C.band : C.white);
       if (c.key === resultKey && rows.length) {
         const st = resultStyle(String(r[c.key]));
         cell.fill = solid(st.fill);
@@ -125,7 +126,7 @@ const ORDER: Record<PageResult, number> = { failed: 0, unverified: 1, skipped: 2
 
 const details = (r: PageRecord) =>
   r.problems
-    .filter((p) => p.severity !== 'info' || ['missing-test-data', 'inaccessible-permission', 'session-rejected', 'login-required', 'configured-skip', 'logout-page', 'smoke-gate', 'cancelled', 'not-checked', 'blocked-by-firewall', 'no-pages-opened', 'qagent-error'].includes(p.type))
+    .filter((p) => p.severity !== 'info' || ['missing-test-data', 'record-found', 'inaccessible-permission', 'session-rejected', 'login-required', 'configured-skip', 'logout-page', 'smoke-gate', 'cancelled', 'not-checked', 'blocked-by-firewall', 'no-pages-opened', 'qagent-error'].includes(p.type))
     .map((p) => `[${p.severity}] ${p.type}: ${p.detail}`)
     .join(' | ')
     .slice(0, 4000);
@@ -331,7 +332,7 @@ const addHistoryRow = (history: Worksheet, job: JobResult, meta: RunMeta, sheet:
     cell.font = font();
     cell.border = { bottom: thin };
     cell.alignment = { vertical: 'middle', horizontal: CENTERED.has(i) ? 'center' : 'left' };
-    if ((hr - 5) % 2 === 1) cell.fill = solid(C.band);
+    cell.fill = solid((hr - 5) % 2 === 1 ? C.band : C.white);
   });
   history.getCell(hr, 9).numFmt = '0%';
   history.getCell(hr, 4).fill = solid(st.fill);
@@ -361,7 +362,22 @@ export const addRuns = (wb: Workbook, jobs: JobResult[], meta: RunMeta) => {
   // Guide, Run History, newest runs, older runs
   // orderNo is real in exceljs but missing from its types
   [guide, history, ...added.reverse(), ...older].forEach((w, i) => ((w as any).orderNo = i));
+  for (const w of wb.worksheets) paintUnfilled(w);
   return added.map((w) => w.name);
+};
+
+/**
+ * Gives every written cell without a fill a white one. Excel's dark mode paints
+ * unfilled cells black, and the sheets' dark text would vanish on them.
+ * Also repairs sheets written by older versions.
+ */
+const paintUnfilled = (ws: Worksheet) => {
+  ws.eachRow({ includeEmpty: false }, (row) =>
+    row.eachCell({ includeEmpty: false }, (cell) => {
+      const f = cell.fill as any;
+      if (!f || f.type !== 'pattern' || f.pattern === 'none' || !f.fgColor) cell.fill = solid(C.white);
+    }),
+  );
 };
 
 /**

@@ -24,8 +24,8 @@ const GLOBAL_FILE = [
 ];
 // Files QAgent cannot trace imports for yet: a change that is not a page's own file tests every page
 const SERVER_EXT = ['.php', '.cs', '.cshtml', '.razor', '.py', '.html', '.htm', '.twig', '.jinja', '.jinja2', '.vue', '.svelte'];
-const IGNORED = /(\.(test|spec|stories)\.\w+$)|(^|\/)(__tests__|__mocks__|e2e|cypress|test|tests|fixtures|docs?)\/|\.(md|mdx|txt|png|jpe?g|gif|svg|ico)$/i;
-const ROUTER_DECL = /createBrowserRouter|createHashRouter|useRoutes\(|<Route[\s>]|<Routes[\s>]/;
+export const IGNORED = /(\.(test|spec|stories)\.\w+$)|(^|\/)(__tests__|__mocks__|e2e|cypress|test|tests|fixtures|docs?)\/|\.(md|mdx|txt|png|jpe?g|gif|svg|ico)$/i;
+export const ROUTER_DECL = /createBrowserRouter|createHashRouter|useRoutes\(|<Route[\s>]|<Routes[\s>]/;
 
 const git = (cwd: string, args: string[]) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 64 * 1024 * 1024 }).trim();
 

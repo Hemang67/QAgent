@@ -106,6 +106,10 @@ export interface PlannedPage {
   url: string | null;
   /** Why the page cannot be opened (missing record ID); the page is reported unverified */
   missing?: string;
+  /** The route's ID parameters (":id" in the path, "?id" in the query), when one is missing: the run may find a record on a list page */
+  params?: string[];
+  /** Pages whose code opens this one (from the project's code), best first: where to look for a record */
+  recordFrom?: { route: string; url: string | null; file: string }[];
   /** Configured skip reason */
   skip?: string;
   exploreTabs: boolean;
@@ -152,6 +156,8 @@ export interface RunJob {
   /** Crawl the running site for pages (no adapter routes, or config asks for it) */
   crawl: boolean;
   crawlLimit: number;
+  /** Pages missing a record ID: open the first record on list pages to find one (default on) */
+  findRecords?: boolean;
   /** Smoke list from config; empty = choose top menu pages at run time */
   smokeList: string[];
   /** Critical flows and CRUD screens, for those types */

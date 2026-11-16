@@ -20,7 +20,7 @@ Run `npm run build` (or `node scripts/build.mjs --no-ui`) before the e2e scripts
 ## Architecture
 
 - `src/engine/` runs as a **separate process** (`dist/engine.js`), started with Electron's own Node (`ELECTRON_RUN_AS_NODE=1`). Protocol: line 1 of stdin is the `RunPlan` JSON (it carries typed passwords, so it must never be written to disk); later stdin lines may be `{"kind":"cancel"}`; stdout is one `EngineMessage` JSON per line. No Electron or vscode imports in the engine.
-- `src/planner/` builds the `RunPlan` from `.qagent.json`, the adapter's routes, test data and the user's choices. It also holds Change-impact (`impact.ts`), new-page detection and the commit reminder.
+- `src/planner/` builds the `RunPlan` from `.qagent.json`, the adapter's routes, test data and the user's choices. It also holds Change-impact (`impact.ts`), new-page detection, the commit reminder, and `record-sources.ts` (which list pages' code opens each page that needs a record ID). The engine's `find-records.ts` opens the first record on those pages during a run; only a URL the app really opened is used.
 - `src/adapters/<framework>/` each implements `detect`, `startCommand`, `environments`, `routes`. Order in `adapters/index.ts` matters (most specific marker first). JS route-object parsing is shared: `codeRoutes()` in `react-router/index.ts` serves React Router, Vue Router and Angular.
 - `src/main/` is the Electron main process (IPC handlers in `main.ts`, run manager, recorder, results reader); `src/preload/preload.ts` is the only bridge; `src/ui/` is React with no Node access. The IPC contract is `src/shared/ipc.ts`.
 - `src/cli.ts` speaks the same engine protocol as the app.

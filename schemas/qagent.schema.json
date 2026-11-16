@@ -323,6 +323,11 @@
       "minimum": 1,
       "default": 300
     },
+    "findRecords": {
+      "type": "boolean",
+      "default": true,
+      "description": "Pages that need a record ID and have none in test data: open the first record on list pages (read-only) and use its ID"
+    },
     "blockedEndpoints": {
       "type": "array",
       "items": {

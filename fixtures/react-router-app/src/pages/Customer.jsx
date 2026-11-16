@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { useData } from '../useData';
 
-// Needs ?customerId=…; with no record ID set, QAgent reports it unverified
+// Needs ?customerId=…; no ID is set in test data, so QAgent finds one by opening the first row on /customers
 export default function Customer() {
   const [searchParams] = useSearchParams();
   const id = searchParams.get('customerId');

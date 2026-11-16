@@ -7,6 +7,7 @@ import { countResults, jobStatus, type JobResult, type PageRecord } from './reco
 import { Session } from './session';
 import { LinkCache, routeMatcher } from './checks/links';
 import { runCrud, runFlow } from './flows';
+import { needsRecord, RecordFinder } from './find-records';
 import { runSecurityScan } from './security/scan';
 import { visitPage, type VisitOptions } from './visit';
 
@@ -26,6 +27,8 @@ const pathKey = (url: string) => {
 export class Runner {
   private cancelled = false;
   private session: Session | null = null;
+  /** Record IDs found on this environment's list pages, shared by its jobs */
+  private records: RecordFinder | null = null;
 
   constructor(
     private plan: RunPlan,
@@ -63,6 +66,7 @@ export class Runner {
     const loginPlan: LoginPlan = this.plan.logins[env] ?? { mode: 'skip', loginPath: '/login' };
 
     if (this.cancelled) return jobs.map((j) => this.cancelledJob(j, ''));
+    this.records = jobs[0].findRecords === false ? null : new RecordFinder(jobs.flatMap((j) => (j.type === 'smoke' ? [] : j.pages)));
 
     this.emit({ kind: 'log', text: `${env}: ${loginPlan.mode === 'browser' ? 'log in in the browser window that opened' : loginPlan.mode === 'credentials' ? 'logging in' : 'login skipped'}` });
     const state = await login(loginPlan, baseUrl, this.session!, env, launch);
@@ -281,10 +285,18 @@ export class Runner {
     });
   }
 
-  /** Every planned page with its tabs; with crawl on, links found on each page join the queue. */
+  /**
+   * Every planned page with its tabs; with crawl on, links found on each page join the queue.
+   * Pages waiting for a record ID go last: the pages before them may lead to a record.
+   */
   private async pages(job: RunJob, context: BrowserContext, visit: VisitOptions, result: JobResult) {
-    const queue: PlannedPage[] = [...job.pages];
+    const finder = this.records;
+    let waiting = finder ? job.pages.filter(needsRecord) : [];
+    const queue: PlannedPage[] = job.pages.filter((p) => !waiting.includes(p));
     const seen = new Set(job.pages.map((p) => (p.url ? pathKey(p.url) : `pattern:${p.route}`)));
+    const foundOn = new Map<PlannedPage, string>();
+    const total = () => queue.length + waiting.length;
+    visit = { ...visit, records: finder };
     if (job.crawl) {
       const start = new URL(visit.login?.loggedInPath ?? '/', job.baseUrl).toString();
       if (!seen.has(pathKey(start))) {
@@ -292,12 +304,14 @@ export class Runner {
         seen.add(pathKey(start));
       }
     }
-    this.emit({ kind: 'job-start', env: job.env, type: job.type, pages: queue.length });
+    this.emit({ kind: 'job-start', env: job.env, type: job.type, pages: total() });
     let limitHit = false;
 
-    await this.pool(queue, async (p) => {
+    const work = async (p: PlannedPage) => {
       const outcome = await this.visit(job, context, p, visit);
-      for (const r of outcome.records) this.record(job, result, r, queue.length);
+      const note = foundOn.get(p);
+      if (note) outcome.records[0].problems.unshift({ type: 'record-found', severity: 'info', detail: note });
+      for (const r of outcome.records) this.record(job, result, r, total());
       if (!job.crawl) return;
       for (const link of outcome.links) {
         const key = pathKey(link);
@@ -310,7 +324,47 @@ export class Runner {
         const u = new URL(link);
         queue.push({ route: u.pathname, url: `${u.origin}${u.pathname}`, exploreTabs: true });
       }
-    });
+    };
+    await this.pool(queue, work);
+
+    // Rounds: pages whose record was found so far; their own visits may lead to further records
+    while (finder && waiting.length && !this.cancelled) {
+      const ready = waiting.filter((p) => finder.get(p.route));
+      if (!ready.length) {
+        // Pages the code says lead to a waiting page, not opened by this test type: open them just to look
+        const sources = finder.pending(waiting);
+        if (!sources.length) break;
+        this.emit({ kind: 'log', text: `${job.env}: looking for records on ${sources.map((s) => s.route).join(', ')}` });
+        const look = { ...visit, checks: undefined, exploreTabs: false, collectLinks: false };
+        await this.pool(
+          sources.map((s) => ({ route: s.route, url: s.url, exploreTabs: false })),
+          async (p) => {
+            await visitPage(context, p, look);
+            finder.skip(p.route);
+          },
+        );
+        continue;
+      }
+      waiting = waiting.filter((p) => !ready.includes(p));
+      const from = queue.length;
+      for (const p of ready) {
+        const f = finder.get(p.route)!;
+        const page: PlannedPage = { ...p, url: f.url, missing: undefined };
+        foundOn.set(page, `No ID in test data: opened ${f.how === 'link' ? 'a link' : 'the first row'} on ${f.from}${p.recordFrom?.some((s) => s.route === f.from) ? ' (the code opens it there)' : ''}`);
+        queue.push(page);
+      }
+      await this.pool(queue, work, from);
+    }
+    // Still without a record: reported unverified (missing-test-data)
+    const tail = queue.length;
+    queue.push(
+      ...waiting.map((p) => ({
+        ...p,
+        missing: `${p.missing}. ${p.recordFrom?.length ? `No record found on ${p.recordFrom.map((s) => s.route).join(', ')}, where the code opens it` : 'No page in the code opens it with an ID, and no list in this run led to one'}`,
+      })),
+    );
+    waiting = [];
+    await this.pool(queue, work, tail);
 
     // Pages the pool never started (cancel); each visit adds exactly one non-tab record
     for (const p of queue.slice(result.records.filter((r) => r.kind !== 'tab').length)) result.records.push(this.unverified(p, 'cancelled', 'The run was cancelled before this page'));
@@ -319,10 +373,10 @@ export class Runner {
   }
 
   /** Runs `work` over a queue that may grow while it runs, `workers` at a time. */
-  private async pool(queue: PlannedPage[], work: (p: PlannedPage) => Promise<void>) {
+  private async pool(queue: PlannedPage[], work: (p: PlannedPage) => Promise<void>, from = 0) {
     const n = Math.max(1, this.plan.workers);
     const running = new Set<Promise<void>>();
-    let next = 0;
+    let next = from;
     while (running.size || (!this.cancelled && next < queue.length)) {
       while (!this.cancelled && running.size < n && next < queue.length) {
         const task: Promise<void> = work(queue[next++]).finally(() => running.delete(task));
