@@ -30,7 +30,7 @@ describe('React Router adapter', () => {
     const byPath = Object.fromEntries(routes.map((r) => [r.path, r]));
     expect(detectAdapter(root).id).toBe('react-router');
     expect(Object.keys(byPath)).toEqual(
-      ['/', '/admin', '/audit', '/colors', '/crash', '/customer', '/customers', '/dashboard', '/guestbook', '/hang', '/invoice', '/links', '/login', '/logout', '/orders', '/orders/:orderId', '/reports', '/search', '/sec', '/settings/profile', '/slow', '/stuck', '/wide'],
+      ['/', '/admin', '/audit', '/colors', '/crash', '/customer', '/customers', '/dashboard', '/guestbook', '/hang', '/invoice', '/links', '/login', '/logout', '/orders', '/orders/:orderId', '/reports', '/search', '/sec', '/settings/profile', '/slow', '/statement', '/stuck', '/wide'],
     );
     expect(byPath['/reports'].file).toBe('src/pages/Reports.jsx'); // React.lazy import
     expect(byPath['/orders/:orderId'].params).toEqual(['orderId']);

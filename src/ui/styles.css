@@ -430,3 +430,15 @@ table.data .details { min-width: 240px; }
 @media (max-width: 1100px) {
   .nav-item { letter-spacing: 0.04em; padding-left: 10px; padding-right: 8px; }
 }
+
+/* ── Smoke picker: chosen pages with a remove button, suggestions to add ── */
+.chip .chip-x { border: 0; background: none; padding: 0 0 0 2px; margin-right: -4px; color: var(--muted); font-size: 16px; line-height: 1; cursor: pointer; }
+.chip .chip-x:hover, .chip .chip-x:focus-visible { color: var(--failed); outline: none; }
+button.chip { font-family: inherit; color: var(--text); }
+.chip.add { border-style: dashed; color: var(--muted); }
+.chip.add:hover { color: var(--text); border-color: var(--accent); }
+.row > input.grow { flex: 1; min-width: 220px; }
+/* Pages screen: Smoke toggle per page */
+.smoke-toggle { border: 1px solid var(--border); background: none; border-radius: var(--radius); padding: 3px 8px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.smoke-toggle:hover { border-color: var(--border-strong); color: var(--text); }
+.smoke-toggle.on { border-color: var(--accent); color: var(--accent); background: rgba(0, 229, 255, 0.10); }

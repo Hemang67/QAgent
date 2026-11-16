@@ -4,6 +4,7 @@ import type { ProjectView } from '../../shared/ipc';
 import { ENV_LABEL, ENV_NAMES, type EnvName } from '../../shared/types';
 import { api } from '../api';
 import { Notice, PageHead } from '../components';
+import { SmokePicker } from '../smoke-picker';
 
 type Urls = Record<EnvName, { url: string; apiUrl: string }>;
 
@@ -127,16 +128,8 @@ export default function Setup({ project, onSaved }: { project: ProjectView; onSa
           <h2>Smoke pages</h2>
           <span className="muted small">{smoke.length ? `${smoke.length} chosen` : 'None chosen: the top menu pages are used'}</span>
         </div>
-        <p className="muted small">Pick about 10 pages most users open every day. Leave all unticked to use the menu on the home page.</p>
-        <div className="toggle-group" style={{ maxHeight: 220, overflow: 'auto' }}>
-          {plainRoutes.map((r) => (
-            <label key={r.path} className={`chip ${smoke.includes(r.path) ? 'on' : ''}`}>
-              <input type="checkbox" checked={smoke.includes(r.path)} onChange={() => toggle(smoke, setSmoke, r.path)} />
-              {r.path}
-            </label>
-          ))}
-          {!plainRoutes.length && <span className="muted">No pages found in the code.</span>}
-        </div>
+        <p className="muted small">Add about 10 pages most users open every day. Leave it empty to use the menu on the home page. You can change this later in Project settings or on the Pages screen.</p>
+        <SmokePicker value={smoke} pages={plainRoutes.map((r) => r.path)} onChange={setSmoke} />
       </div>
 
       <div className="card">

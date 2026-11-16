@@ -6,6 +6,7 @@ export const ROUTES = {
   customer: '/customer',
   customers: '/customers',
   invoice: '/invoice',
+  statement: '/statement',
   reports: '/reports',
   crash: '/crash',
   stuck: '/stuck',

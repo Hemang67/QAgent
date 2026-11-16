@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 
-// Needs ?invoiceId=…, and no page leads to one: QAgent reports it unverified (missing-test-data)
+// Needs ?invoiceId=…, opened only by the Invoices button on /customers: QAgent clicks it
 export default function Invoice() {
   const [searchParams] = useSearchParams();
   const id = searchParams.get('invoiceId');

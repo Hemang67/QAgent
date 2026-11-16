@@ -186,7 +186,7 @@ export interface QAgentApi {
   /** Pages and send/book/charge endpoints added since the base branch */
   newPages(root: string, base?: string): Promise<{ ok: true; base: string; pages: (RouteInfo & { configured: boolean })[]; endpoints: EndpointCandidate[] } | { ok: false; error: string }>;
   /** For each page that needs a record ID: the pages whose code opens it, where a run looks for a record */
-  recordSources(root: string): Promise<Record<string, { route: string; file: string }[]>>;
+  recordSources(root: string): Promise<Record<string, { route: string; file: string; labels?: string[] }[]>>;
   /** Merges record IDs into .qagent/test-data.<env>.json (this machine only) */
   saveTestData(root: string, env: EnvName, data: Record<string, string>): Promise<void>;
   reminderStatus(root: string): Promise<{ state: 'installed' | 'not-installed' | 'not-git' | 'other-hook'; hookFile?: string; line?: string }>;

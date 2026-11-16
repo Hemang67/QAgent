@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { ProjectView } from '../../shared/ipc';
 import { ENV_LABEL, ENV_NAMES } from '../../shared/types';
 import { api } from '../api';
-import { FileLink, PageHead } from '../components';
+import { FileLink, Notice, PageHead } from '../components';
 import NewPages from './NewPages';
 
 const HOW: Record<string, string> = { router: 'Router code', filesystem: 'Folder structure', crawl: 'Crawl', config: 'Settings' };
@@ -15,12 +15,25 @@ export default function Pages({ project, onSaved }: { project: ProjectView; onSa
   const keyFor = (route: string, param: string) => project.config.pages?.[route]?.params?.[param.replace(/^\?/, '')] ?? param.replace(/^\?/, '');
   // Where a run opens a record when no ID is set: read from the project's code
   const finding = project.config.findRecords !== false;
-  const [sources, setSources] = useState<Record<string, { route: string; file: string }[]> | null>(null);
+  const [sources, setSources] = useState<Record<string, { route: string; file: string; labels?: string[] }[]> | null>(null);
   useEffect(() => {
     setSources(null);
     if (finding && project.routes.some((r) => r.params.length)) api.recordSources(project.root).then(setSources, () => setSources({}));
   }, [project.root, project.routes, finding]);
   const unset = (route: string, params: string[]) => envs.some((e) => params.some((p) => !project.testDataKeys[e]?.includes(keyFor(route, p))));
+
+  // Smoke list, changed right here: saved to .qagent.json at once
+  const smoke = project.config.lists?.smoke ?? [];
+  const inSmoke = (route: string) => smoke.some((s) => s.toLowerCase() === route.toLowerCase());
+  const loginPath = (project.config.login?.path ?? '/login').toLowerCase();
+  const smokeable = (route: string, params: string[]) => !params.length && route.toLowerCase() !== loginPath && !/log-?out|sign-?out/i.test(route);
+  const [smokeError, setSmokeError] = useState('');
+  const toggleSmoke = async (route: string) => {
+    const next = inSmoke(route) ? smoke.filter((s) => s.toLowerCase() !== route.toLowerCase()) : [...smoke, route];
+    const r = await api.saveConfig(project.root, { ...project.config, lists: { ...project.config.lists, smoke: next } });
+    setSmokeError(r.ok ? '' : r.errors.join('; '));
+    if (r.ok) onSaved();
+  };
 
   return (
     <div className="page">
@@ -28,6 +41,7 @@ export default function Pages({ project, onSaved }: { project: ProjectView; onSa
         <input type="text" placeholder="Filter" value={query} onChange={(e) => setQuery(e.target.value)} />
       </PageHead>
       <NewPages project={project} onSaved={onSaved} />
+      {smokeError && <Notice kind="error">Could not save the Smoke list: {smokeError}</Notice>}
       {!project.routes.length && <div className="empty">No pages were found in the code. Each run crawls the site from the home page instead.</div>}
       {project.routes.length > 0 && (
         <div className="card flush">
@@ -35,6 +49,7 @@ export default function Pages({ project, onSaved }: { project: ProjectView; onSa
             <thead>
               <tr>
                 <th>Page</th>
+                <th title="Pages Smoke opens after login. None chosen: the top menu pages">Smoke · {smoke.length || 'menu'}</th>
                 <th>Source file</th>
                 <th>Found from</th>
                 <th>Record IDs needed</th>
@@ -47,6 +62,18 @@ export default function Pages({ project, onSaved }: { project: ProjectView; onSa
                   <tr key={r.path}>
                     <td className="mono">
                       {r.path} {skip && <span className="tag" title={skip}>skipped</span>}
+                    </td>
+                    <td>
+                      {smokeable(r.path, r.params) && (
+                        <button
+                          className={`smoke-toggle ${inSmoke(r.path) ? 'on' : ''}`}
+                          aria-pressed={inSmoke(r.path)}
+                          title={inSmoke(r.path) ? 'In the Smoke list: click to remove' : 'Add to the Smoke list'}
+                          onClick={() => toggleSmoke(r.path)}
+                        >
+                          {inSmoke(r.path) ? '◆ Smoke' : '+ Smoke'}
+                        </button>
+                      )}
                     </td>
                     <td>
                       <FileLink file={r.file} onOpen={(f) => api.openFile(project.root, f)} />
@@ -71,7 +98,7 @@ export default function Pages({ project, onSaved }: { project: ProjectView; onSa
                           {!sources ? (
                             'Looking in the code for the pages that open it…'
                           ) : sources[r.path]?.length ? (
-                            <span title={sources[r.path].map((s) => `${s.route}: ${s.file}`).join('\n')}>Without an ID, a run opens the first record on {sources[r.path].map((s) => s.route).join(', ')}</span>
+                            <span title={sources[r.path].map((s) => `${s.route}: ${s.file}`).join('\n')}>Without an ID, a run opens the first record on {sources[r.path].map((s) => (s.labels?.length ? `${s.route} (${s.labels[0]})` : s.route)).join(', ')}</span>
                           ) : (
                             'No page in the code opens it with an ID: a run tries the first row of the lists it tests'
                           )}

@@ -350,7 +350,7 @@ export class Runner {
       for (const p of ready) {
         const f = finder.get(p.route)!;
         const page: PlannedPage = { ...p, url: f.url, missing: undefined };
-        foundOn.set(page, `No ID in test data: opened ${f.how === 'link' ? 'a link' : 'the first row'} on ${f.from}${p.recordFrom?.some((s) => s.route === f.from) ? ' (the code opens it there)' : ''}`);
+        foundOn.set(page, `No ID in test data: opened ${f.how} on ${f.from}${p.recordFrom?.some((s) => s.route === f.from) ? ' (the code opens it there)' : ''}`);
         queue.push(page);
       }
       await this.pool(queue, work, from);
@@ -360,7 +360,11 @@ export class Runner {
     queue.push(
       ...waiting.map((p) => ({
         ...p,
-        missing: `${p.missing}. ${p.recordFrom?.length ? `No record found on ${p.recordFrom.map((s) => s.route).join(', ')}, where the code opens it` : 'No page in the code opens it with an ID, and no list in this run led to one'}`,
+        missing: `${p.missing}. ${
+          p.recordFrom?.length
+            ? `No record found where the code opens it: ${p.recordFrom.map((s) => `${s.route} (${finder?.note(s.route) || (s.url ? 'not opened' : 'not opened: it needs a record ID itself')})`).join('; ')}`
+            : 'No page in the code opens it with an ID, and no list in this run led to one'
+        }`,
       })),
     );
     waiting = [];

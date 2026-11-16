@@ -306,12 +306,48 @@ console.log('New project: first-time setup');
   check((await win.locator('input[type="url"]').nth(2).inputValue()) === 'https://dev.shop.example', 'Dev URL detected from .env.development');
   check(await win.getByText('/api/payments/charge').isVisible(), 'side-effect endpoint offered for blocking');
   check(!(await win.getByText('/api/payments/history').count()), 'read-only endpoint not offered');
+  // Smoke pages: search adds, × removes, a typed path is accepted
+  await win.locator('.boot').waitFor({ state: 'detached', timeout: 15_000 }).catch(() => {});
+  const addSmoke = win.getByLabel('Add a Smoke page');
+  await addSmoke.fill('dash');
+  await win.getByRole('button', { name: '+ /dashboard' }).click();
+  await addSmoke.fill('/about');
+  await addSmoke.press('Enter');
+  await addSmoke.fill('/reports/weekly');
+  await win.getByRole('button', { name: 'Add', exact: true }).click();
+  await win.getByRole('button', { name: 'Remove /about' }).click();
+  check(
+    (await win.getByRole('button', { name: /^Remove \// }).count()) === 2 && (await win.getByRole('button', { name: 'Remove /reports/weekly' }).isVisible()),
+    'Setup adds Smoke pages by search or typed path, and removes them',
+  );
   await shot(win, '12-setup');
   await win.getByRole('button', { name: 'Save and continue' }).click();
   await win.getByRole('heading', { name: 'Run tests' }).waitFor({ timeout: 15_000 });
-  const saved = JSON.parse(fs.readFileSync(path.join(fresh, '.qagent.json'), 'utf8'));
+  const qagentJson = () => JSON.parse(fs.readFileSync(path.join(fresh, '.qagent.json'), 'utf8'));
+  const saved = qagentJson();
   check(saved.environments?.dev?.url === 'https://dev.shop.example' && saved.blockedEndpoints?.includes('/api/payments/charge'), '.qagent.json written with URLs and blocked endpoints');
+  check(JSON.stringify(saved.lists?.smoke) === '["/dashboard","/reports/weekly"]', 'Smoke pages saved from Setup');
   check(fs.readFileSync(path.join(fresh, '.gitignore'), 'utf8').includes('qagent-results.xlsx'), '.gitignore updated');
+
+  // Pages screen: the Smoke toggle saves at once
+  await win.getByRole('button', { name: 'Pages', exact: true }).click();
+  await win.getByRole('heading', { name: 'Pages' }).waitFor();
+  await win.locator('tr', { hasText: '/about' }).getByRole('button', { name: '+ Smoke' }).click();
+  await win.locator('tr', { hasText: '/about' }).getByRole('button', { name: '◆ Smoke' }).waitFor({ timeout: 5000 }).catch(() => {});
+  check(qagentJson().lists?.smoke?.includes('/about'), 'Pages screen adds a page to Smoke');
+  await win.locator('tr', { hasText: '/dashboard' }).getByRole('button', { name: '◆ Smoke' }).click();
+  await win.locator('tr', { hasText: '/dashboard' }).getByRole('button', { name: '+ Smoke' }).waitFor({ timeout: 5000 }).catch(() => {});
+  check(!qagentJson().lists?.smoke?.includes('/dashboard'), 'Pages screen removes a page from Smoke');
+  await shot(win, '13-pages-smoke');
+
+  // Project settings: remove with ×, then Save
+  await win.getByRole('button', { name: 'Project settings' }).click();
+  await win.getByRole('heading', { name: 'Project settings' }).waitFor();
+  await win.getByRole('button', { name: 'Remove /reports/weekly' }).click();
+  await win.getByRole('button', { name: 'Save', exact: true }).click();
+  await win.getByText('Saved.').waitFor({ timeout: 5000 }).catch(() => {});
+  check(JSON.stringify(qagentJson().lists?.smoke) === '["/about"]', 'Project settings removes a Smoke page and saves');
+  await shot(win, '14-settings-smoke');
   await app.close();
   fs.rmSync(fresh, { recursive: true, force: true });
 }

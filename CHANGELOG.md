@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3 — 2026-11-16
+
+- Smoke pages are easy to add and remove: chosen pages show as chips with a ×, and a search box adds any page found in your code, or a path you type. The picker is on Setup and Project settings, and every page on the Pages screen has a Smoke toggle that saves at once.
+- Finding record IDs: when a list opens its records through a button in the row (Permissions, Display Columns, View Sketch) rather than the row itself, QAgent now clicks that button. It reads the button's label from your code, then tries the row, then other safely labelled buttons in the row. It never clicks Delete, Save, Send, Convert or similar.
+- A page that still has no record says why, list by list: no rows in the table, the row opened nothing or another page, or the button is disabled for your account.
+
 ## 0.1.2 — 2026-11-16
 
 - Pages that need a record ID no longer stay unverified when you have not set one. QAgent reads your project's code to find the list pages that open each one. During the run it opens the first record there (a link, or the first table row) and tests the page the app opened. The Pages screen shows where each page's record will come from. Results say which list the record came from, or where QAgent looked when it found none. IDs you set in test data still come first; `"findRecords": false` in `.qagent.json` turns this off.

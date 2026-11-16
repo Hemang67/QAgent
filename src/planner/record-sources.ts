@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { listFiles, rel } from '../adapters/common';
-import type { RouteInfo } from '../shared/types';
+import { RISKY_CONTROL, type RouteInfo } from '../shared/types';
 import { IGNORED, ROUTER_DECL } from './impact';
 
 // Files that can open a page: code, components and server templates
@@ -32,11 +32,39 @@ const inNavigation = (text: string, index: number) => {
   return NAVIGATES.test(text.slice(Math.max(0, start), end < 0 ? undefined : end));
 };
 
+// The visible label of a control: title="…", label={t('…')}, aria-label="…", or <button>Text</button>
+const LABEL = /\b(?:title|label|aria-label|tooltip|text)\s*=\s*\{?\s*(?:t\(\s*)?['"`]([^'"`{}<>\n]{2,40})['"`]|>\s*(?:\{\s*t\(\s*['"`])?([A-Za-z][\w .&/-]{1,38}?)(?:['"`]\s*\)\s*\})?\s*<\/(?:button|Button|a|Link|NavLink|MenuItem|span)\b/g;
+const LABEL_BEFORE = 12;
+const LABEL_AFTER = 8;
+
+/**
+ * Labels of the control that opens the page: the ones nearest the navigation, a few
+ * lines around it ("Permissions" for a button whose onPress navigates). Labels of
+ * controls QAgent never clicks (Delete, Save…) are left out.
+ */
+const labelsNear = (text: string, index: number): string[] => {
+  let start = index;
+  for (let n = 0; n < LABEL_BEFORE && start > 0; n++) start = text.lastIndexOf('\n', start - 1);
+  let end = index;
+  for (let n = 0; n < LABEL_AFTER && end >= 0 && end < text.length; n++) end = text.indexOf('\n', end + 1);
+  start = Math.max(0, start);
+  const window = text.slice(start, end < 0 ? undefined : end);
+  return [...window.matchAll(LABEL)]
+    .map((m) => ({ label: (m[1] ?? m[2] ?? '').trim(), distance: Math.abs(start + m.index! - index) }))
+    // Not code: identifiers (packagingNotes), paths, expressions
+    .filter((l) => l.label.length > 1 && /[A-Za-z]/.test(l.label) && !RISKY_CONTROL.test(l.label) && !/[./=]|^\$|^[a-z]+[A-Z_]\w*$/.test(l.label))
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, 2)
+    .map((l) => l.label);
+};
+
 /** A page whose code opens a page that needs a record ID (a list leading to its records). */
 export interface RecordSource {
   route: string;
   /** The file holding the link or navigation, relative to the project */
   file: string;
+  /** Labels of the control that opens it, when the code names one ("Permissions") */
+  labels?: string[];
 }
 
 const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -121,24 +149,27 @@ export const recordSources = (root: string, routes: RouteInfo[]): Record<string,
     const literal = fixed.length > 1 ? new RegExp(`['"\`]${esc(fixed)}${fixed === w.path ? `(?=['"\`?/#]|\\$\\{)` : ''}`, 'gi') : null;
     const fixedLower = fixed.toLowerCase();
 
-    const found = new Map<string, { route: string; depth: number; file: string }>();
+    const found = new Map<string, { route: string; depth: number; file: string; labels: string[] }>();
     for (const [file, t] of texts) {
       if (file === own) continue;
       const low = lower.get(file)!;
       const res = [literal && low.includes(fixedLower) ? literal : null, ...usages.filter((u) => t.includes(u.text)).map((u) => u.re)].filter((r): r is RegExp => !!r);
       if (!res.length) continue;
       const body = low.includes(needle) ? t.replace(def, '') : t;
-      if (!res.some((re) => [...body.matchAll(re)].some((m) => inNavigation(body, m.index!)))) continue;
+      const at = res.flatMap((re) => [...body.matchAll(re)].map((m) => m.index!)).filter((i) => inNavigation(body, i));
+      if (!at.length) continue;
+      const labels = [...new Set(at.flatMap((i) => labelsNear(body, i)))];
       for (const p of pagesOf(file)) {
         if (p.route === w.path) continue;
         const prev = found.get(p.route);
-        if (!prev || p.depth < prev.depth) found.set(p.route, { ...p, file: rel(root, file) });
+        if (!prev || p.depth < prev.depth) found.set(p.route, { ...p, file: rel(root, file), labels });
+        else if (p.depth === prev.depth) prev.labels = [...new Set([...prev.labels, ...labels])];
       }
     }
     out[w.path] = [...found.values()]
       .sort((a, b) => a.depth - b.depth || Number(needsId.has(a.route)) - Number(needsId.has(b.route)) || a.route.localeCompare(b.route))
       .slice(0, MAX_SOURCES)
-      .map(({ route, file }) => ({ route, file }));
+      .map(({ route, file, labels }) => (labels.length ? { route, file, labels: labels.slice(0, 3) } : { route, file }));
   }
   return out;
 };

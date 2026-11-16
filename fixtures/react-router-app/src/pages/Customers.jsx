@@ -4,8 +4,9 @@ import { api } from '../api';
 import { useData } from '../useData';
 
 // A list whose rows open the detail page by click, not by link (like many admin apps).
-// QAgent opens the first row to find a customerId for /customer. The select box and
-// Delete button are left alone; the delete call would be blocked anyway.
+// QAgent opens the first row to find a customerId for /customer, and clicks the row's
+// Invoices button (named in this code) for an invoiceId. The select box and Delete
+// button are left alone; the delete call would be blocked anyway.
 export default function Customers() {
   const navigate = useNavigate();
   const { loading, data } = useData('/customers');
@@ -15,7 +16,7 @@ export default function Customers() {
       <h1>Customers</h1>
       <table>
         <thead>
-          <tr><th>Select</th><th>ID</th><th>Name</th><th>Actions</th></tr>
+          <tr><th>Select</th><th>ID</th><th>Name</th><th>Billing</th><th>Actions</th></tr>
         </thead>
         <tbody>
           {data.map((c) => (
@@ -23,6 +24,16 @@ export default function Customers() {
               <td><input type="checkbox" aria-label={`Select ${c.name}`} onClick={(e) => e.stopPropagation()} /></td>
               <td>{c.id}</td>
               <td>{c.name}</td>
+              <td>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`${ROUTES.invoice}?invoiceId=${c.id * 100}`);
+                  }}
+                >
+                  Invoices
+                </button>
+              </td>
               <td>
                 <button onClick={(e) => (e.stopPropagation(), api(`/customers/${c.id}`, { method: 'DELETE' }).catch(() => {}))}>Delete</button>
               </td>

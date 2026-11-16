@@ -11,6 +11,7 @@ import OrderDetail from './pages/OrderDetail';
 import Customer from './pages/Customer';
 import Customers from './pages/Customers';
 import Invoice from './pages/Invoice';
+import Statement from './pages/Statement';
 import Search from './pages/Search';
 import Audit from './pages/Audit';
 import Profile from './pages/Profile';
@@ -41,6 +42,7 @@ const router = createBrowserRouter([
       { path: ROUTES.customer, element: <Customer /> },
       { path: ROUTES.customers, element: <Customers /> },
       { path: ROUTES.invoice, element: <Invoice /> },
+      { path: ROUTES.statement, element: <Statement /> },
       { path: ROUTES.reports, element: <Reports /> },
       { path: ROUTES.crash, element: <Crash /> },
       { path: ROUTES.stuck, element: <Stuck /> },

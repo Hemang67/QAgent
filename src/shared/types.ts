@@ -20,6 +20,13 @@ export type TestType =
   | 'visual'
   | 'security';
 
+/**
+ * Labels of controls QAgent never clicks while looking for a record: they change data,
+ * send something, or leave the page in a state the next check should not see.
+ * The read-only guard would block the request anyway; this keeps QAgent from trying.
+ */
+export const RISKY_CONTROL = /delete|remove|trash|archive|cancel|reject|approve|confirm|submit|save|send|e-?mail|print|download|export|upload|import|copy|duplicate|clone|convert|close|log ?out|sign ?out|pay|charge|book|post|publish|reset|clear|lock|disable|enable|activate|block|add\b|new\b|create/i;
+
 export const TEST_TYPE_LABEL: Record<TestType, string> = {
   smoke: 'Smoke',
   impact: 'Change-impact',
@@ -109,7 +116,7 @@ export interface PlannedPage {
   /** The route's ID parameters (":id" in the path, "?id" in the query), when one is missing: the run may find a record on a list page */
   params?: string[];
   /** Pages whose code opens this one (from the project's code), best first: where to look for a record */
-  recordFrom?: { route: string; url: string | null; file: string }[];
+  recordFrom?: { route: string; url: string | null; file: string; labels?: string[] }[];
   /** Configured skip reason */
   skip?: string;
   exploreTabs: boolean;

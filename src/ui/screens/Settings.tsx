@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { QAgentConfig } from '../../shared/config';
 import type { ProjectView } from '../../shared/ipc';
 import { api } from '../api';
 import { Notice, PageHead } from '../components';
+import { SmokePicker } from '../smoke-picker';
 
 const lines = (v: string[] | undefined) => (v ?? []).join('\n');
 const fromLines = (s: string) => s.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
@@ -71,6 +72,12 @@ export default function Settings({ project, onSaved, onSetup }: { project: Proje
       onSaved();
     }
   };
+
+  // Pages Smoke can open: found in the code, no record ID needed, not login or logout
+  const smokeCandidates = useMemo(() => {
+    const login = (cfg.login?.path ?? '/login').toLowerCase();
+    return project.routes.filter((r) => !r.params.length && r.path.toLowerCase() !== login && !/log-?out|sign-?out/i.test(r.path)).map((r) => r.path);
+  }, [project.routes, cfg.login?.path]);
 
   const env = (name: 'dev' | 'test' | 'live') => cfg.environments?.[name];
   // URLs read from .env files are used when the setting is empty; show them as the placeholder
@@ -165,12 +172,17 @@ export default function Settings({ project, onSaved, onSetup }: { project: Proje
           </div>
 
           <div className="card">
+            <div className="section-title">
+              <h2>Smoke pages</h2>
+              <span className="muted small">{cfg.lists?.smoke?.length ? `${cfg.lists.smoke.length} chosen` : 'None chosen: the top menu pages are used'}</span>
+            </div>
+            <p className="muted small">The pages Smoke opens after login: about 10 that most users open every day. Saved with the other settings.</p>
+            <SmokePicker value={cfg.lists?.smoke ?? []} pages={smokeCandidates} onChange={(smoke) => patch((c) => ({ ...c, lists: { ...c.lists, smoke } }))} />
+          </div>
+
+          <div className="card">
             <h2>Pages and safety</h2>
             <div className="grid-2">
-              <label className="field">
-                Smoke pages, one per line (empty = top menu pages)
-                <textarea rows={6} value={lines(cfg.lists?.smoke)} onChange={(e) => patch((c) => ({ ...c, lists: { ...c.lists, smoke: fromLines(e.target.value) } }))} />
-              </label>
               <label className="field">
                 Blocked endpoints, one per line (never called, in any test type)
                 <textarea rows={6} value={lines(cfg.blockedEndpoints)} onChange={(e) => patch((c) => ({ ...c, blockedEndpoints: fromLines(e.target.value) }))} />
