@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.4 — 2026-11-18
+
+- New About section at the bottom of App settings: what QAgent is, who develops it, the version, and the folder where QAgent keeps its settings. **Help → About QAgent** now opens it.
+- The publisher shown in Windows' installed apps list is now Hemang Rathod.
+
 ## 0.1.3 — 2026-11-16
 
 - Smoke pages are easy to add and remove: chosen pages show as chips with a ×, and a search box adds any page found in your code, or a path you type. The picker is on Setup and Project settings, and every page on the Pages screen has a Smoke toggle that saves at once.

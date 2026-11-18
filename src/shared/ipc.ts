@@ -150,7 +150,8 @@ export interface ValidationResult {
 }
 
 export interface QAgentApi {
-  appInfo(): Promise<{ version: string; platform: string }>;
+  /** `dataDir` is the folder holding QAgent's settings and recent projects */
+  appInfo(): Promise<{ version: string; platform: string; dataDir: string }>;
   listProjects(): Promise<RecentProject[]>;
   pickProject(): Promise<string | null>;
   /** Path of a folder dropped on the window */

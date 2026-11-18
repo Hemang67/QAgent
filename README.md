@@ -125,4 +125,4 @@ Design, safety rules, publishing and the full user guide: [QAgent – Design, Pu
 
 ## Licence
 
-MIT © Techovarya
+MIT © Hemang Rathod

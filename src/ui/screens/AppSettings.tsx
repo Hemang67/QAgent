@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { AppSettings as Settings, BrowserStatus, EditorChoice } from '../../shared/ipc';
 import { api } from '../api';
 import { Logo, Notice, PageHead } from '../components';
@@ -11,10 +11,23 @@ const EDITORS: [EditorChoice, string][] = [
   ['system', 'System default app'],
 ];
 
-export default function AppSettings({ onTour }: { onTour: () => void }) {
+const DEVELOPER = 'Hemang Rathod';
+const DEVELOPER_URL = 'https://hemang-rathod.vercel.app';
+const SOURCE_URL = 'https://github.com/Hemang67/QAgent';
+
+type Props = {
+  onTour: () => void;
+  /** Scroll to the About section (Help → About), then report it was shown */
+  showAbout?: boolean;
+  onAboutShown?: () => void;
+};
+
+export default function AppSettings({ onTour, showAbout, onAboutShown }: Props) {
   const [s, setS] = useState<Settings | null>(null);
   const [browser, setBrowser] = useState<BrowserStatus | null>(null);
-  const [info, setInfo] = useState<{ version: string; platform: string } | null>(null);
+  const [info, setInfo] = useState<{ version: string; platform: string; dataDir: string } | null>(null);
+  const aboutRef = useRef<HTMLElement>(null);
+  const loaded = s !== null;
   const [installing, setInstalling] = useState(false);
   const [installLog, setInstallLog] = useState<string[]>([]);
   const [installError, setInstallError] = useState('');
@@ -25,6 +38,13 @@ export default function AppSettings({ onTour }: { onTour: () => void }) {
     api.appInfo().then(setInfo);
     return api.onInstallLog((line) => setInstallLog((l) => [...l.slice(-30), line]));
   }, []);
+
+  // The page renders once settings are loaded, so wait for them before scrolling
+  useEffect(() => {
+    if (!showAbout || !loaded) return;
+    aboutRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    onAboutShown?.();
+  }, [showAbout, loaded, onAboutShown]);
 
   const update = (patch: Partial<Settings>) => {
     const next = { ...s!, ...patch };
@@ -120,15 +140,6 @@ export default function AppSettings({ onTour }: { onTour: () => void }) {
         </div>
       </div>
 
-      <div className="card row" style={{ alignItems: 'center', gap: 20 }}>
-        <Logo size={96} />
-        <div>
-          <h2 style={{ marginBottom: 4 }}>QAgent {info?.version}</h2>
-          <p className="muted small" style={{ margin: 0 }}>Tests any web app and records the results in Excel. MIT licence · Techovarya</p>
-          <button className="btn link" onClick={() => api.openExternal('https://github.com/Hemang67/QAgent')}>github.com/Hemang67/QAgent</button>
-        </div>
-      </div>
-
       <div className="card">
         <h2>Getting started</h2>
         <p className="muted small">A guided tour of the real screens, testing a demo shop on this computer.</p>
@@ -136,6 +147,34 @@ export default function AppSettings({ onTour }: { onTour: () => void }) {
           Take the tour
         </button>
       </div>
+
+      <section className="card about" ref={aboutRef} aria-labelledby="about-title">
+        <h2 id="about-title">About</h2>
+        <div className="about-app">
+          <Logo size={72} />
+          <div>
+            <div className="about-name">QAgent</div>
+            <div className="about-tagline">Every page, checked.</div>
+            <div className="muted small">“Tests any web app and records the results in Excel.”</div>
+            <button className="btn link" onClick={() => api.openExternal(SOURCE_URL)}>
+              Source code on GitHub ↗
+            </button>
+          </div>
+        </div>
+        <div className="about-dev">
+          <div className="label">Developed by</div>
+          <div className="about-dev-name">{DEVELOPER}</div>
+          <div className="about-role">Full Stack Developer</div>
+          <div className="small">Code. Build. Deploy. Repeat.</div>
+          <div className="muted small">Turning ideas into impact through technology.</div>
+          <button className="btn link" onClick={() => api.openExternal(DEVELOPER_URL)}>
+            hemang-rathod.vercel.app ↗
+          </button>
+        </div>
+        <p className="muted small about-foot">
+          Version {info?.version} · MIT licence · © {new Date().getFullYear()} {DEVELOPER} · settings and recent projects are stored on this computer, in <span className="mono">{info?.dataDir}</span>
+        </p>
+      </section>
 
       <p className="muted small">QAgent stores only this list of settings and your recent projects. Passwords and login sessions are never saved.</p>
     </div>

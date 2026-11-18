@@ -76,7 +76,7 @@ const buildMenu = () => {
         { label: 'Check for updates', click: () => updater.check() },
         { type: 'separator' },
         { label: 'Releases and downloads', click: () => shell.openExternal(RELEASES_URL) },
-        { label: `About QAgent ${app.getVersion()}`, click: () => dialog.showMessageBox({ title: 'QAgent', message: `QAgent ${app.getVersion()}`, detail: 'Tests any web app and records the results in Excel.\nMIT licence · Techovarya' }) },
+        { label: `About QAgent ${app.getVersion()}`, click: cmd('about') },
       ],
     },
   ];
@@ -119,7 +119,7 @@ const createWindow = () => {
 
 const registerIpc = () => {
   const handle = (channel: string, fn: (...args: any[]) => unknown) => ipcMain.handle(channel, (_e, ...args) => fn(...args));
-  handle('appInfo', () => ({ version: app.getVersion(), platform: process.platform }));
+  handle('appInfo', () => ({ version: app.getVersion(), platform: process.platform, dataDir: app.getPath('userData') }));
   handle('listProjects', () => listProjects());
   handle('pickProject', async () => {
     const r = await dialog.showOpenDialog(win!, { title: 'Open a web project', properties: ['openDirectory'] });

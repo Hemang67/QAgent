@@ -357,7 +357,7 @@ Linux packages are not code-signed; each release publishes `SHA256SUMS` so downl
 **One-time setup**
 
 1. **Repository:** the public repository is https://github.com/Hemang67/QAgent.
-2. **App identity:** `package.json` → `name` `qagent`, `productName` `QAgent`, `version`, `description`, `author` (Techovarya), `license` `MIT`, `repository`; `build.appId` `com.techovarya.qagent`.
+2. **App identity:** `package.json` → `name` `qagent`, `productName` `QAgent`, `version`, `description`, `author` (Hemang Rathod: the Publisher shown in Windows' installed apps list), `license` `MIT`, `repository`; `build.appId` `com.techovarya.qagent`.
 3. **Icons:** `build/icon.ico` (Windows, 256×256 inside) and `build/icon.png` (512×512, Linux).
 4. **Release config:** `electron-builder` targets `nsis` (Windows) and `AppImage`, `deb` (Linux), with `publish: github`.
 5. **Signing:** apply to SignPath Foundation; once approved, add its GitHub Action step to the Windows job.
@@ -455,7 +455,7 @@ QAgent checks GitHub Releases when it starts and every few hours. When a new ver
 | Project menu → Add new pages | Finds new pages and side-effect endpoints since the base branch and asks where they belong |
 | Project menu → List pages | Every page QAgent found, how it was found, and its source file |
 | Project menu → Approve visual baseline | Accepts the latest screenshots as the new baseline |
-| App settings | Editor used to open files, theme, beta updates, update checks |
+| App settings | Editor used to open files, theme, beta updates, update checks, the tour; About (version, developer, where settings are stored), also from **Help → About QAgent** |
 
 **Reading results**
 
@@ -500,7 +500,7 @@ QAgent is built in five phases, each one usable on its own; the first public rel
 | Distribution | Public download on GitHub Releases (https://github.com/Hemang67/QAgent), in-app updates | Confirmed |
 | Windows signing | SignPath Foundation (free for open source); unsigned until approved | Confirmed (free option first) |
 | Name | QAgent | Confirmed |
-| Publisher / app ID | Techovarya / `com.techovarya.qagent` | Default |
+| Publisher / app ID | Hemang Rathod / `com.techovarya.qagent` (the app ID stays so installed copies keep updating) | Confirmed Nov 18, 2026 |
 | Results location | `qagent-results.xlsx` in the project root, gitignored | Confirmed |
 | Record IDs | `.qagent/test-data.<env>.json`, gitignored | Confirmed |
 | Live security scan | Restricted active checks allowed with `LIVE SECURITY` | Confirmed |

@@ -35,6 +35,8 @@ export default function App() {
   const [version, setVersion] = useState('');
   const [tour, setTour] = useState(false);
   const [notes, setNotes] = useState<ReleaseNotes[]>([]);
+  // Help → About opens App settings scrolled to its About section
+  const [showAbout, setShowAbout] = useState(false);
   useEffect(() => {
     api.appInfo().then((i) => setVersion(i.version));
     // First launch: the tour. After an update: what's new. Either way, this version is now seen.
@@ -83,6 +85,7 @@ export default function App() {
         else if (cmd === 'tour') setTour(true);
         else if (cmd === 'whats-new') api.whatsNew(true).then(setNotes);
         else if (cmd === 'open-project') pick();
+        else if (cmd === 'about') (setScreen('app-settings'), setShowAbout(true));
         else if (cmd === 'projects' || cmd === 'app-settings') setScreen(cmd);
         else if (project) setScreen(cmd as Screen);
       }),
@@ -146,7 +149,7 @@ export default function App() {
           </div>
         )}
         {screen === 'projects' && <Projects onOpen={open} onPick={pick} current={project?.root ?? null} />}
-        {screen === 'app-settings' && <AppSettings onTour={() => setTour(true)} />}
+        {screen === 'app-settings' && <AppSettings onTour={() => setTour(true)} showAbout={showAbout} onAboutShown={() => setShowAbout(false)} />}
         {project && screen === 'setup' && <Setup project={project} onSaved={async () => (await reload(), setScreen('run'))} />}
         {project && screen === 'run' && <Run project={project} run={run} dispatch={dispatch} onResults={showResults} onSetup={() => setScreen('settings')} />}
         {project && screen === 'results' && <Results project={project} sheet={resultsSheet} onSheet={setResultsSheet} />}
